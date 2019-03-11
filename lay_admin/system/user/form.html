@@ -48,9 +48,11 @@
 			<div class="layui-form-item">
 				<label class="layui-form-label">{{lang.authorize||''}}</label>
 				<div class="layui-input-block">
-					{{#layui.each(authorizes, function(index, item){}}
-					<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}">
-					{{#});}}
+					{{#layui.each(authorizes,function(index,item){ var checked=true; layui.each(data.authorize,function(index1,item1){ if(item.id==item1){}}
+					<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}" checked />
+					{{#checked=false;return; } }); if(checked){}}
+					<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}" />
+					{{#} });}}
 					<p class="help-block color-desc">{{lang.authorize_description||''}}</p>
 				</div>
 			</div>
