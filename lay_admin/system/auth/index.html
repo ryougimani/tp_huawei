@@ -1,5 +1,5 @@
 <script type="text/html" template>
-	<link rel="stylesheet" href="{{ layui.setter.base }}style/tableFilter.css?v={{ layui.admin.v }}-1" media="all">
+	<link rel="stylesheet" href="{{layui.setter.base}}style/tableFilter.css?v={{layui.admin.v}}-1" media="all">
 </script>
 
 <title>系统角色</title>
@@ -19,16 +19,19 @@
 					<button class="layui-btn layui-btn-sm" lay-event="add">添加角色</button>
 				</div>
 			</script>
-			<table id="content-list" lay-filter="content-list" lay-size="sm"></table>
+			<table id="content-list" lay-filter="content-list"></table>
+			<script type="text/html" id="table-content-status">
+				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{d.status == 1 ? 'checked' : ''}}>
+			</script>
 			<script type="text/html" id="table-content-operation">
 				<div class="layui-btn-group">
 					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
 					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
-					{{# if(d.id != 1) { }}
+					{{#if(d.id != 1) {}}
 					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
-					{{# } else { }}
+					{{#} else {}}
 					<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
-					{{# } }}
+					{{#}}}
 				</div>
 			</script>
 		</div>
@@ -51,10 +54,11 @@
 			url: layui.setter.controlUrl + '/index.html',
 			cols: [[
 				{type: 'checkbox', fixed: 'left'},
-				{field: 'id', title: 'ID', minWidth: 70, align: 'center'},
+				{field: 'id', title: 'ID', width: 70, align: 'center'},
 				{field: 'name', title: '角色名称', minWidth: 200, align: 'center'},
 				{field: 'desc', title: '角色描述', minWidth: 150, align: 'center'},
-				{title: '操作', minWidth: 180, align:'center', fixed: 'right', toolbar: '#table-content-operation'}
+				{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
+				{title: '操作', fixed: 'right', width: 140, align:'center', unresize: true, toolbar: '#table-content-operation'}
 			]],
 			height: 'full-150', // 最大高度
 		});

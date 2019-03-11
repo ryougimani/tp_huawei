@@ -20,6 +20,16 @@ return [
 	'get_success' => '获取数据成功！',
 	'form_success' => '数据保存成功!',
 	'form_error' => '数据保存失败, 请稍候再试!',
+	'enables_success' => '启用成功！',
+	'enables_error' => '启用失败，请稍候再试！',
+	'disables_success' => '禁用成功！',
+	'disables_error' => '禁用失败，请稍候再试！',
+	'del_success' => '删除成功！',
+	'del_error' => '删除失败，请稍候再试！',
+	'sort_success' => '列表排序成功, 正在刷新列表',
+	'sort_error' => '列表排序失败, 请稍候再试',
+	'restore_success' => '还原成功！',
+	'restore_error' => '还原失败，请稍候再试！',
 	// field
 	'id' => 'ID',
 ];

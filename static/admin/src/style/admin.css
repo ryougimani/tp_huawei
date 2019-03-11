@@ -529,4 +529,6 @@ html{background-color: #f2f2f2; color: #666;}
   自定义
 
  */
+.layui-table-tree-icon { display: inline-block; width: 16px; height: 16px; }
+.layui-table-tree-icon i { cursor: pointer; }
 .layui-btn-group .layui-btn-disabled:first-child { border-left: 1px solid #e6e6e6; }

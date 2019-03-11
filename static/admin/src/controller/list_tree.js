@@ -1,39 +1,35 @@
-layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
+layui.define(['table', 'element', 'form'], function (exports) {
 	var $ = layui.$,
 		admin = layui.admin,
 		view = layui.view,
 		element = layui.element,
 		table = layui.table,
-		tableFilter = layui.tableFilter,
 		form = layui.form;
+
+	let $body = $('body');
+
+	// 注册 data-sub-show 事件行为 (显示子集)
+	$body.on('click', '[data-sub-show]', function () {
+		$(this).hide().nextAll('[data-sub-hide]').show();
+	});
+	// 注册 data-sub-hide 事件行为 (隐藏子集)
+	$body.on('click', '[data-sub-hide]', function () {
+		$(this).hide().prevAll('[data-sub-show]').show();
+	});
 
 	// 设定表格默认参数
 	table.set({
-		elem: '#content-list',
+		elem: '#content-list-tree',
 		where: {
 			access_token: layui.data('layuiAdmin').access_token
 		},
-		autoSort: false, // 自动处理排序
 		toolbar: '#table-header-operation', // 开启表格头部工具栏区域
-		page: true, // 开启分页
-		limit: 30, // 每页显示的条数
-		limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], // 每页条数的选择项
+		page: false, // 开启分页
 		text: '对不起，加载出现异常！'
 	});
 
-	// 监听排序事件
-	table.on('sort(content-list)', function(obj){
-		table.reload('content-list', {
-			initSort: obj,
-			where: {
-				field: obj.field,
-				order: obj.type
-			}
-		});
-	});
-
 	// 监听头部工具栏事件
-	table.on('toolbar(content-list)', function(obj){
+	table.on('toolbar(content-list-tree)', function(obj){
 		// var checkStatus = table.checkStatus(obj.config.id);
 		switch(obj.event){
 			case 'add': // 添加
@@ -52,7 +48,7 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 											type: 'post',
 											data: data.field,
 											success: function (res) {
-												layui.table.reload('content-list');
+												layui.table.reload('content-list-tree');
 												layer.close(index);
 											}
 										});
@@ -64,15 +60,41 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 					}
 				});
 				break;
-			case 'del':
-
-				break;
 		}
 	});
 
 	// 监听表格工具条
-	table.on('tool(content-list)', function (obj) {
+	table.on('tool(content-list-tree)', function (obj) {
 		switch (obj.event) {
+			case 'add': // 添加
+				admin.req({
+					url: layui.setter.controlUrl + '/add.html',
+					data: {pid: obj.data.id},
+					done: function (res) {
+						admin.popupRight({
+							id: 'popupRight-add',
+							area: layui.setter.popupRightArea,
+							success: function (layero, index) {
+								view(this.id).render(layui.setter.templateUrl + '/form', res.data).done(function () {
+									form.render(null, 'form');
+									form.on('submit(form-submit)', function (data) {
+										admin.req({
+											url: layui.setter.controlUrl + '/add.html',
+											type: 'post',
+											data: data.field,
+											done: function (res) {
+												layui.table.reload('content-list-tree');
+												layer.close(index);
+											}
+										});
+
+									});
+								});
+							}
+						});
+					}
+				});
+				break;
 			case 'edit': // 编辑
 				admin.req({
 					url: layui.setter.controlUrl + '/edit.html',
@@ -90,7 +112,7 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 											type: 'post',
 											data: data.field,
 											done: function (res) {
-												layui.table.reload('content-list');
+												layui.table.reload('content-list-tree');
 												layer.close(index);
 											}
 										});
@@ -145,55 +167,33 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 	});
 
 	// 监听单元格编辑
-	table.on('edit(content-list)', function(obj){
+	table.on('edit(content-list-tree)', function(obj){
 		admin.req({
 			url: layui.setter.controlUrl + '/' + obj.field + '.html',
 			type: 'post',
 			data: {id : obj.data.id, field: obj.field, value: obj.value},
 			done: function (res) {
-				layui.table.reload('content-list');
+				layui.table.reload('content-list-tree');
 			}
 		});
 	});
 
 	// 监听状态操作
 	form.on('switch(status)', function(obj){
-		// layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
 		if (obj.elem.checked) { // 启用
 			admin.req({
 				url: layui.setter.controlUrl + '/enables.html',
 				type: 'post',
-				data: {id : this.value, field: 'status'},
+				data: {id : this.value, field: 'status', value: 1},
 			});
 		} else { // 禁用
 			admin.req({
 				url: layui.setter.controlUrl + '/disables.html',
 				type: 'post',
-				data: {id : this.value, field: 'status'},
+				data: {id : this.value, field: 'status', value: 0},
 			});
 		}
 	});
 
-	// 标签切换
-	element.on('tab(content-header-tab)', function(elem){
-		table.reload('content-list', {
-			url: layui.setter.controlUrl + $(this).attr('lay-url'),
-		});
-	});
-
-	// 渲染搜索表单
-	layui.data.search_form = function (d) {
-		form.render(null, 'list-search-form');
-	};
-
-	// 监听搜索
-	form.on('submit(list-search)', function (data) {
-		var field = data.field;
-		// 执行重载
-		table.reload('content-list', {
-			where: field
-		});
-	});
-
-	exports('list', {})
+	exports('list_tree', {})
 });

@@ -35,7 +35,7 @@ class User extends BasicAdmin {
 	public function index() {
 		$db = Db::name($this->table)->field($this->field);
 		$this->_list_where($db);
-		return parent::_list($db);
+		return parent::_list($db,true, 'index');
 	}
 
 	/**
@@ -47,7 +47,7 @@ class User extends BasicAdmin {
 	 * @throws \think\exception\DbException
 	 */
 	public function recycle() {
-		$db = Db::name($this->table)->order(['id' => 'desc']);
+		$db = Db::name($this->table)->field($this->field);
 		$this->_list_where($db);
 		return parent::_list($db, true, 'index');
 	}

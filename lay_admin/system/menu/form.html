@@ -1,0 +1,64 @@
+<div class="layui-card-header">系统菜单</div>
+<div class="layui-card-body">
+	<div class="layui-form layui-col-md11" lay-filter="form">
+		<script type="text/html" template>
+			{{#var data=d.params,lang=data.otherData.lang;}}
+			{{#var menus=data.otherData.menus;}}
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.parent||''}}</label>
+				<div class="layui-input-block">
+					<select name="pid">
+						{{#layui.each(menus, function(index, item){}}
+						{{#if(item.id==(data.pid||0)){}}
+						<option value="{{item.id}}" selected>{{item.spl}}{{item.title}}</option>
+						{{#}else{}}
+						<option value="{{item.id}}">{{item.spl}}{{item.title}}</option>
+						{{#}}}
+						{{#});}}
+					</select>
+					<div class="layui-form-mid layui-word-aux">{{lang.parent_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.title||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" name="title" class="layui-input" lay-verify="" value="{{data.title||''}}" placeholder="{{lang.title_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.title_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.name||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" name="name" class="layui-input" lay-verify="" value="{{data.name||''}}" placeholder="{{lang.name_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.name_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.url||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" name="url" class="layui-input" lay-verify="" value="{{data.url||''}}" placeholder="{{lang.title_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.url_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.node||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" name="node" class="layui-input" lay-verify="" value="{{data.node||''}}" placeholder="{{lang.node_placeholder||''}}" onblur="(this.value === '') && (this.value = '#')" />
+					<div class="layui-form-mid layui-word-aux">{{lang.node_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<div class="layui-footer">
+						{{#if(data.id){}}<input type="hidden" name="id" lay-verify="required" value="{{data.id||''}}"/>{{#}}}
+						{{data.__token__||''}}
+						<button class="layui-btn" lay-submit lay-filter="form-submit">{{lang.save||''}}</button>
+					</div>
+				</div>
+			</div>
+		</script>
+	</div>
+</div>
+
+<script>
+</script>

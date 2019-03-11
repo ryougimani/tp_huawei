@@ -1,0 +1,79 @@
+<title>系统菜单</title>
+
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">系统</a>
+		<a><cite>系统菜单</cite></a>
+	</div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-body">
+			<script type="text/html" id="table-header-operation">
+				<div class="layui-btn-container">
+					<button class="layui-btn layui-btn-sm" lay-event="add">添加菜单</button>
+				</div>
+			</script>
+			<table id="content-list-tree" lay-filter="content-list-tree"></table>
+			<script type="text/html" id="table-content-tree">
+				<div class="layui-table-tree-icon">
+					{{#if(d.id != d.ids){}}
+					<i class="layui-icon layui-icon-triangle-r" data-sub-show style="display: none;"></i>
+					<i class="layui-icon layui-icon-triangle-d" data-sub-hide></i>
+					{{#}}}
+				</div>
+				{{d.spl}}{{d.title}}
+			</script>
+			<script type="text/html" id="table-content-status">
+				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{d.status == 1 ? 'checked' : ''}}>
+			</script>
+			<script type="text/html" id="table-content-operation">
+				<div class="layui-btn-group">
+					{{#if(d.level < 2){}}
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="add">添加下级</button>
+					{{#}else{}}
+					<button class="layui-btn layui-btn-xs layui-btn-disabled">添加下级</button>
+					{{#}}}
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+				</div>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+	layui.use('list_tree', layui.factory('list_tree')).use(['admin', 'list_tree', 'table'], function(){
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			table = layui.table,
+			form = layui.form;
+
+		layui.setter['controlUrl'] = '/admin/system.node';
+		layui.setter['templateUrl'] = 'system/node';
+
+		admin.req({
+			url: layui.setter.controlUrl + '/index.html',
+			done: function (res) {
+
+			}
+		});
+
+		// // 表格
+		// table.render({
+		// 	url: layui.setter.controlUrl + '/index.html',
+		// 	cols: [[
+		// 		{type: 'checkbox', fixed: 'left'},
+		// 		{field: 'title', title: '菜单名称', minWidth: 200, toolbar: '#table-content-tree'},
+		// 		{field: 'url', title: '菜单链接', minWidth: 150, align: 'center'},
+		// 		{field: 'node', title: '菜单节点', minWidth: 150, align: 'center'},
+		// 		{field: 'sort', title: '排序', width: 80, align: 'center', edit: true},
+		// 		{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
+		// 		{title: '操作', fixed: 'right', width: 160, align:'center', unresize: true, toolbar: '#table-content-operation'}
+		// 	]],
+		// 	height: 'full-150', // 最大高度
+		// });
+	});
+</script>

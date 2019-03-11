@@ -190,7 +190,7 @@ layui.extend({
   
   //初始主体结构
   layui.link(
-    setter.base + 'style/admin.css?v='+ (admin.v + '-1')
+    setter.base + 'style/admin.css?v='+ (admin.v + new Date().getTime())
     ,function(){
       entryPage()
     }

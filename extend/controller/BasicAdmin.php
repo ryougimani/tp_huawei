@@ -16,6 +16,7 @@ use think\Response;
 use think\Db;
 use service\DataService;
 use service\LogService;
+use service\ToolsService;
 
 /**
  * 后台权限基础控制器
@@ -276,5 +277,45 @@ class BasicAdmin extends Controller {
 	 */
 	protected function _search_from($data = []) {
 		$this->success(lang('get_success'), '', array_merge(['lang' => $this->_lang()], $data));
+	}
+
+	/**
+	 * 生成下拉选择框内容
+	 * @access protected
+	 * @param \think\db\Query|string $dbQuery 数据库查询对象
+	 * @param bool $tree 是否树形
+	 * @param string $firstValue 首行值
+	 * @param string $key 键
+	 * @param int $root
+	 * @param string $pk 主键
+	 * @param string $ppk 父主键
+	 * @return array|\PDOStatement|string|\think\Collection
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 */
+	protected function _form_select($dbQuery = null, $tree = false, $firstValue = '', $key = 'name', $root = -1, $pk = 'id', $ppk = 'pid') {
+		$db = is_null($dbQuery) ? Db::name($this->table) : (is_string($dbQuery) ? Db::name($dbQuery) : $dbQuery);
+		$fields = $db->getTableFields();
+		if (null === $db->getOptions('order')) {
+			in_array('sort', $fields) && $db->order(['sort' => 'asc', 'id' => 'asc']);
+		}
+//		if (null === $db->getOptions('where') ) {
+//			in_array('status', $fields) && $db->where('status', 1);
+			in_array('is_deleted', $fields) && $db->where('is_deleted', 0);
+//		}
+		$data = $db->select();
+		empty($firstValue) && $firstValue = lang('class_placeholder');
+		if ($tree) {
+			foreach ($data as &$val) {
+				$val['ids'] = join(',', ToolsService::getListSubId($data, $val['id']));
+			}
+			$root == -1 && array_unshift($data, [$key => $firstValue, $pk => 0, $ppk => -1, 'ids' => '0']);
+			$data = ToolsService::listToTable($data, $root, $pk, $ppk);
+			//array_unshift($data, [$key => $firstValue, $pk => 0, 'ids' => '', 'spl' => '', 'path' => '-0']);
+		} else {
+			array_unshift($data, [$key => $firstValue, $pk => '']);
+		}
+		return $data;
 	}
 }

@@ -1,5 +1,5 @@
 <script type="text/html" template>
-	<link rel="stylesheet" href="{{ layui.setter.base }}style/tableFilter.css?v={{ layui.admin.v }}-1" media="all">
+	<link rel="stylesheet" href="{{layui.setter.base}}style/tableFilter.css?v={{layui.admin.v}}-1" media="all">
 </script>
 
 <title>用户列表</title>
@@ -24,20 +24,20 @@
 			<div class="layui-form-item">
 				<script type="text/html" template lay-url="/admin/system.user/search_from.html" lay-done="layui.data.search_form(d);">
 					<div class="layui-inline">
-						<label class="layui-form-label">{{ d.data.lang.id }}</label>
+						<label class="layui-form-label">{{d.data.lang.id}}</label>
 						<div class="layui-input-inline">
 							<input type="text" name="id" class="layui-input" autocomplete="off" />
 						</div>
 					</div>
 					<div class="layui-inline">
-						<label class="layui-form-label">{{ d.data.lang.username }}</label>
+						<label class="layui-form-label">{{d.data.lang.username}}</label>
 						<div class="layui-input-inline">
 							<input type="text" name="username" class="layui-input" autocomplete="off" />
 						</div>
 					</div>
 					<div class="layui-inline">
 						<button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="list-search">
-							<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>{{ d.data.lang.search }}
+							<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>{{d.data.lang.search}}
 						</button>
 					</div>
 				</script>
@@ -49,39 +49,39 @@
 					<button class="layui-btn layui-btn-sm" lay-event="add" data-url="/admin/system.user/add.html">添加用户</button>
 				</div>
 			</script>
-			<table id="content-list" lay-filter="content-list" lay-size="sm"></table>
+			<table id="content-list" lay-filter="content-list"></table>
 			<script type="text/html" id="table-content-status">
-				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{d.status == 1 ? 'checked' : ''}}>
 			</script>
 			<script type="text/html" id="table-content-operation">
-				{{# if(d.is_deleted == 0) { }}
-				{{# if(d.id != 10000) { }}
+				{{#if(d.is_deleted == 0) {}}
+				{{#if(d.id != 10000) {}}
 				<div class="layui-btn-group">
 					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
 					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="pwd">密码</button>
 					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
 					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
 				</div>
-				{{# } else { }}
+				{{#} else {}}
 				<div class="layui-btn-group">
 					<button class="layui-btn layui-btn-xs layui-btn-disabled">编辑</button>
 					<button class="layui-btn layui-btn-xs layui-btn-disabled">密码</button>
 					<button class="layui-btn layui-btn-xs layui-btn-disabled">授权</button>
 					<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
 				</div>
-				{{# } }}
-				{{# } else if(d.is_deleted == 1) { }}
+				{{#}}}
+				{{#} else if(d.is_deleted == 1) {}}
 				<div class="layui-btn-group">
 					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="restore">还原</button>
 				</div>
-				{{# } }}
+				{{#}}}
 			</script>
 		</div>
 	</div>
 </div>
 
 <script>
-	layui.use('list', layui.factory('list')).use(['admin', 'list'], function(){
+	layui.use('list', layui.factory('list')).use(['admin', 'list', 'table'], function(){
 		var $ = layui.$,
 			admin = layui.admin,
 			view = layui.view,
@@ -97,15 +97,15 @@
 			url: layui.setter.controlUrl + '/index.html',
 			cols: [[
 				{type: 'checkbox', fixed: 'left'},
-				{field: 'id', title: 'id', align: 'center', minWidth: 70, sort: true},
+				{field: 'id', title: 'id', align: 'center', width: 70, sort: true},
 				{field: 'username', title: '用户账号', minWidth: 200, align: 'center'},
 				{field: 'phone', title: '用户手机', minWidth: 150, align: 'center'},
 				{field: 'email', title: '电子邮箱', minWidth: 150, align: 'center'},
 				{field: 'authorize', title: '用户角色', minWidth: 150, align: 'center'},
 				{field: 'login_num', title: '登录次数', minWidth: 90, align: 'center'},
 				{field: 'login_time', title: '最后登录时间', width: 160, align: 'center'},
-				{field: 'status', title: '状态', width: 100, align: 'center',  toolbar: '#table-content-status'},
-				{title: '操作', minWidth: 180, align:'center', fixed: 'right', toolbar: '#table-content-operation'}
+				{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
+				{title: '操作', fixed: 'right', width: 180, align:'center', unresize: true, toolbar: '#table-content-operation'}
 			]],
 			height: 'full-270', // 最大高度
 			// initSort: {field: 'id', type: 'desc'}, // 默认排序
