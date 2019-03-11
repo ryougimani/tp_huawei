@@ -1,0 +1,91 @@
+<script type="text/html" template>
+	<link rel="stylesheet" href="{{ layui.setter.base }}style/tableFilter.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<title>用户列表</title>
+
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">主页</a>
+		<a><cite>系统</cite></a>
+		<a><cite>用户列表</cite></a>
+	</div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-tab layui-tab-brief">
+			<ul class="layui-tab-title">
+				<li class="layui-this">全部</li>
+				<li>回收站</li>
+			</ul>
+		</div>
+		<div class="layui-card-body">
+			<script type="text/html" id="table-header-operation">
+				<div class="layui-btn-container">
+					<button class="layui-btn layui-btn-sm" lay-event="add" data-url="/admin/system.user/add.html">添加用户</button>
+				</div>
+			</script>
+			<table id="content-list" lay-filter="content-list" lay-size="sm"></table>
+			<script type="text/html" id="table-content-operation">
+				{{# if(d.id != 10000) { }}
+				<div class="layui-btn-group">
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="pwd">密码</button>
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
+					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+				</div>
+				{{# } else { }}
+				<div class="layui-btn-group">
+					<button class="layui-btn layui-btn-xs layui-btn-disabled">编辑</button>
+					<button class="layui-btn layui-btn-xs layui-btn-disabled">密码</button>
+					<button class="layui-btn layui-btn-xs layui-btn-disabled">授权</button>
+					<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
+				</div>
+				{{# } }}
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+	layui.use('list', layui.factory('list')).use(['admin', 'list'], function(){
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			table = layui.table,
+			form = layui.form;
+
+		layui.setter['controlUrl'] = '/admin/system.user';
+		layui.setter['templateUrl'] = 'system/user';
+
+		// 表格
+		table.render({
+			url: layui.setter.controlUrl + '/index.html',
+			cols: [[
+				{type: 'checkbox', fixed: 'left'},
+				{field: 'id', title: 'id', align: 'center', minWidth: 70, sort: true},
+				{field: 'username', title: '用户账号', minWidth: 200, align: 'center'},
+				{field: 'phone', title: '用户手机', minWidth: 150, align: 'center'},
+				{field: 'email', title: '电子邮箱', minWidth: 150, align: 'center'},
+				{field: 'authorize', title: '用户角色', minWidth: 150, align: 'center'},
+				{field: 'login_num', title: '登录次数', minWidth: 90, align: 'center'},
+				{field: 'login_time', title: '最后登录时间', align: 'center', width: 160},
+				{title: '操作', minWidth: 180, align:'center', fixed: 'right', toolbar: '#table-content-operation'}
+			]],
+			height: 'full-220', // 最大高度
+			// initSort: {field: 'id', type: 'desc'}, // 默认排序
+		});
+
+		// 监听排序事件
+		table.on('sort(content-list)', function(obj){
+			table.reload('content-list', {
+				initSort: obj,
+				where: {
+					field: obj.field,
+					order: obj.type
+				}
+			});
+		});
+	});
+</script>

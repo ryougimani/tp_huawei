@@ -1,0 +1,73 @@
+
+<script type="text/html" template>
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">系统</a>
+		<a><cite></cite></a>
+	</div>
+</div>
+</script>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<script type="text/html" template lay-url="/admin/system.log/search_from.html" lay-done="layui.data.search_form(d);">
+		<div class="layui-form layui-form-pane layui-card-header layuiadmin-card-header-auto" lay-filter="list-search-form">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">{{ d.data.lang.username }}</label>
+					<div class="layui-input-block">
+						<input type="text" name="username" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">{{ d.data.lang.action }}</label>
+					<div class="layui-input-block">
+						<select name="action">
+							<option value="">- {{ d.data.lang.action }} -</option>
+							{{# layui.each(d.data.actions, function(index, item){ }}
+							<option value="{{ item }}">{{ item }}</option>
+							{{# }); }}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<button class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" lay-submit lay-filter="list-search">
+						<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i> {{ d.data.lang.search }}
+					</button>
+				</div>
+			</div>
+		</div>
+		</script>
+		<div class="layui-card-body">
+			<table id="content-list" lay-filter="content-list"></table>
+		</div>
+	</div>
+</div>
+
+<script>
+	layui.use('list', layui.factory('list')).use(['admin', 'list', 'table'], function () {
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			table = layui.table,
+			form = layui.form,
+			laytpl = layui.laytpl;
+
+		layui.setter['controlUrl'] = '/admin/system.log';
+		layui.setter['templateUrl'] = 'system/log';
+
+		table.render({
+			url: layui.setter.controlUrl + '/index.html',
+			cols: [[
+				{field: 'username', title: '操作者', align: 'center'},
+				{field: 'node', title: '节点', align: 'center'},
+				{field: 'action', title: '行为', align: 'center'},
+				{field: 'content', title: '操作内容', align: 'center'},
+				{field: 'isp', title: '操作位置', align: 'center'},
+				{field: 'create_time', title: '操作时间', align: 'center', width: 160}
+			]],
+			height: 'full-220', // 最大高度
+		});
+
+	});
+</script>

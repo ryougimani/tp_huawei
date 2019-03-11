@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{block name="title"}{$title|default=''}{if !empty($title)}·{/if}{:system_config('site_name')}{/block}</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="__STATIC__/plugs/layui/css/layui.css?ver={:time()}" media="all"/>
+</head>
+<body>
+<div id="LAY_app"></div>
+<script src="__STATIC__/plugs/layui/layui.js"></script>
+<script>
+	layui.config({
+		base: '__STATIC__/admin/src/',
+		// version: '1.2.1'
+		version: new Date().getTime(),
+	}).use('index', function () {
+		// layui.admin.req({
+		// 	url: '/admin/lang.html',
+		// 	done: function (res) {
+		// 		layui.data.lang = res.data;
+		// 	}
+		// });
+	});
+</script>
+</body>
+</html>

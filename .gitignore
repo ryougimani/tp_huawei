@@ -1,0 +1,12 @@
+!.gitignore
+!.gitattributes
+*.DS_Store
+*.idea
+*.svn
+*.git
+/runtime
+/nbproject
+!composer.json
+/composer.lock
+/static/upload
+/json

@@ -1,0 +1,44 @@
+<title>文章列表</title>
+
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">主页</a>
+		<a><cite>内容</cite></a>
+		<a><cite>文章列表</cite></a>
+	</div>
+</div>
+
+<div class="layui-card">
+	<div class="layui-card-body">
+		<table id="content-list" lay-filter="content-list"></table>
+		<script type="text/html" id="table-content-list">
+			<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+			<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+		</script>
+	</div>
+</div>
+<script>
+	layui.use('list', layui.factory('list')).use(['admin', 'list', 'table'], function(){
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			table = layui.table,
+			form = layui.form;
+
+		table.render({
+			elem: '#content-list',
+			url: '/admin/common.article/index.html', //模拟接口
+			toolbar: true,
+			cols: [[
+				{type: 'checkbox', fixed: 'left'},
+				{field: 'title', title: '文章标题'},
+				{field: 'class_name', title: '文章分类'},
+				{title: '操作', align:'center', fixed: 'right', toolbar: '#table-content-list'}
+			]],
+			page: true,
+			limit: 20,
+			skin: 'line',
+			text: '对不起，加载出现异常！'
+		});
+	});
+</script>

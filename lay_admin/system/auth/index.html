@@ -1,0 +1,62 @@
+<script type="text/html" template>
+	<link rel="stylesheet" href="{{ layui.setter.base }}style/tableFilter.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<title>系统角色</title>
+
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">系统</a>
+		<a><cite>系统角色</cite></a>
+	</div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-card-body">
+			<script type="text/html" id="table-header-operation">
+				<div class="layui-btn-container">
+					<button class="layui-btn layui-btn-sm" lay-event="add">添加角色</button>
+				</div>
+			</script>
+			<table id="content-list" lay-filter="content-list" lay-size="sm"></table>
+			<script type="text/html" id="table-content-operation">
+				<div class="layui-btn-group">
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
+					{{# if(d.id != 1) { }}
+					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+					{{# } else { }}
+					<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
+					{{# } }}
+				</div>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+	layui.use('list', layui.factory('list')).use(['admin', 'list'], function(){
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			table = layui.table,
+			form = layui.form;
+
+		layui.setter['controlUrl'] = '/admin/system.auth';
+		layui.setter['templateUrl'] = 'system/auth';
+
+		// 表格
+		table.render({
+			url: layui.setter.controlUrl + '/index.html',
+			cols: [[
+				{type: 'checkbox', fixed: 'left'},
+				{field: 'id', title: 'ID', minWidth: 70, align: 'center'},
+				{field: 'name', title: '角色名称', minWidth: 200, align: 'center'},
+				{field: 'desc', title: '角色描述', minWidth: 150, align: 'center'},
+				{title: '操作', minWidth: 180, align:'center', fixed: 'right', toolbar: '#table-content-operation'}
+			]],
+			height: 'full-150', // 最大高度
+		});
+	});
+</script>
