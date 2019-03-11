@@ -136,6 +136,7 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     }
 
     //自定义
+	,popupArea: '60%' //
 	,popupRightArea: '80%' //
     // ,controlUrl: '',
   });

@@ -1,7 +1,8 @@
-layui.define(['table', 'form', 'tableFilter'], function (exports) {
+layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 	var $ = layui.$,
 		admin = layui.admin,
 		view = layui.view,
+		element = layui.element,
 		table = layui.table,
 		tableFilter = layui.tableFilter,
 		form = layui.form;
@@ -18,6 +19,17 @@ layui.define(['table', 'form', 'tableFilter'], function (exports) {
 		limit: 30, // 每页显示的条数
 		limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], // 每页条数的选择项
 		text: '对不起，加载出现异常！'
+	});
+
+	// 监听排序事件
+	table.on('sort(content-list)', function(obj){
+		table.reload('content-list', {
+			initSort: obj,
+			where: {
+				field: obj.field,
+				order: obj.type
+			}
+		});
 	});
 
 	// 监听头部工具栏事件
@@ -91,7 +103,7 @@ layui.define(['table', 'form', 'tableFilter'], function (exports) {
 				});
 				break;
 			case 'del': // 删除
-				layer.confirm('确定要删除ID为' + obj.data.id + '的数据吗？', function(index){
+				layer.confirm('确定是否要删除ID为' + obj.data.id + '的数据吗？', function(index){
 					admin.req({
 						url: layui.setter.controlUrl + '/del.html',
 						type: 'post',
@@ -103,8 +115,58 @@ layui.define(['table', 'form', 'tableFilter'], function (exports) {
 					layer.close(index);
 				});
 				break;
-
+			case 'restore': // 还原
+				layer.confirm('确定是否要还原ID为' + obj.data.id + '的数据吗？', function(index){
+					admin.req({
+						url: layui.setter.controlUrl + '/restore.html',
+						type: 'post',
+						data: {id : obj.data.id, field: 'restore'},
+						done: function (res) {
+							layui.table.reload('content-list');
+						}
+					});
+					layer.close(index);
+				});
+				break;
+			case 'thorough-del': // 删除
+				layer.confirm('确定是否要彻底删除ID为' + obj.data.id + '的数据吗？', function(index){
+					admin.req({
+						url: layui.setter.controlUrl + '/thorough_del.html',
+						type: 'post',
+						data: {id : obj.data.id, field: 'restore'},
+						done: function (res) {
+							layui.table.reload('content-list');
+						}
+					});
+					layer.close(index);
+				});
+				break;
 		}
+	});
+
+	// 监听状态操作
+	form.on('switch(status)', function(obj){
+		// layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+		if (obj.elem.checked) { // 启用
+			admin.req({
+				url: layui.setter.controlUrl + '/enables.html',
+				type: 'post',
+				data: {id : this.value, field: 'status'},
+			});
+		} else { // 禁用
+			admin.req({
+				url: layui.setter.controlUrl + '/disables.html',
+				type: 'post',
+				data: {id : this.value, field: 'status'},
+			});
+		}
+	});
+
+	// 标签切换
+	element.on('tab(content-header-tab)', function(elem){
+		table.reload('content-list', {
+			url: layui.setter.controlUrl + $(this).attr('lay-url'),
+		});
 	});
 
 	// 渲染搜索表单

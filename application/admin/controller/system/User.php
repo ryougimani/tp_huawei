@@ -22,7 +22,7 @@ use service\ToolsService;
 class User extends BasicAdmin {
 
 	protected $table = 'SystemUser';
-	protected $field = 'id,username,phone,email,login_num,login_time,authorize,department_id,status';
+	protected $field = 'id,username,phone,email,login_num,login_time,authorize,department_id,status,is_deleted';
 
 	/**
 	 * 列表
@@ -36,6 +36,20 @@ class User extends BasicAdmin {
 		$db = Db::name($this->table)->field($this->field);
 		$this->_list_where($db);
 		return parent::_list($db);
+	}
+
+	/**
+	 * 回收站列表
+	 * @access public
+	 * @return array|string
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 */
+	public function recycle() {
+		$db = Db::name($this->table)->order(['id' => 'desc']);
+		$this->_list_where($db);
+		return parent::_list($db, true, 'index');
 	}
 
 	/**
@@ -55,6 +69,15 @@ class User extends BasicAdmin {
 					$db->where($key, 'eq', $get[$key]);
 				}
 			}
+		}
+		// 标签条件
+		switch ($this->request->action()) {
+			case 'index':
+				$db->where('is_deleted', 'eq', 0);
+				break;
+			case 'recycle': // 回收站
+				$db->where('is_deleted', 'eq', 1);
+				break;
 		}
 	}
 
@@ -129,6 +152,36 @@ class User extends BasicAdmin {
 	}
 
 	/**
+	 * 用户密码修改
+	 * @access public
+	 * @return \think\response\View
+	 * @throws \think\Exception
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 * @throws \think\exception\PDOException
+	 */
+	public function password() {
+		$this->_is_super_admin();
+		return parent::_form($this->table, 'password');
+	}
+
+	/**
+	 * 授权管理
+	 * @access public
+	 * @return \think\response\View
+	 * @throws \think\Exception
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 * @throws \think\exception\PDOException
+	 */
+	public function auth() {
+		$this->_is_super_admin();
+		return parent::_form($this->table, 'auth');
+	}
+
+	/**
 	 * 表单数据默认处理
 	 * @access public
 	 * @param array $data
@@ -154,8 +207,38 @@ class User extends BasicAdmin {
 				isset($data['authorize']) && $data['authorize'] = array_filter(explode(',', $data['authorize']));
 				$otherData['authorizes'] = Db::name('SystemAuth')->where('status', 1)->select();
 			}
+			if (in_array($this->request->action(), ['password'])) {
+				$otherData['not_auth'] = false;
+			}
 			$data['otherData'] = $otherData;
 		}
+	}
+
+	/**
+	 * 启用操作
+	 * @access public
+	 * @throws \think\Exception
+	 * @throws \think\exception\PDOException
+	 */
+	public function enables() {
+		if ($this->_update($this->table)) {
+			$this->success(lang('enables_success'), '');
+		}
+		$this->error(lang('enables_error'));
+	}
+
+	/**
+	 * 禁用操作
+	 * @access public
+	 * @throws \think\Exception
+	 * @throws \think\exception\PDOException
+	 */
+	public function disables() {
+		$this->_is_super_admin();
+		if ($this->_update($this->table)) {
+			$this->success(lang('disables_success'), '');
+		}
+		$this->error(lang('disables_error'));
 	}
 
 	/**
@@ -170,6 +253,19 @@ class User extends BasicAdmin {
 			$this->success(lang('del_success'), '');
 		}
 		$this->error(lang('del_error'));
+	}
+
+	/**
+	 * 还原操作
+	 * @access public
+	 * @throws \think\Exception
+	 * @throws \think\exception\PDOException
+	 */
+	public function restore() {
+		if ($this->_update($this->table)) {
+			$this->success(lang('restore_success'), '');
+		}
+		$this->error(lang('restore_error'));
 	}
 
 	/**
