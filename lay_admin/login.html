@@ -52,6 +52,7 @@
 
 		//提交
 		form.on('submit(login-submit)', function (obj) {
+			// console.log(obj.field);
 			admin.req({
 				url: '/admin/login.html',
 				type: 'post',

@@ -9,39 +9,31 @@
 
 namespace app\admin\validate;
 
-use think\validate;
-use think\Db;
+use think\Validate;
 
 /**
- * 系统菜单验证器
- * Class SystemMenu
+ * 用户角色验证器
+ * Class MemberAuth
  * @package app\admin\validate
  */
-class SystemMenu extends validate {
+class MemberAuth extends Validate {
 
 	protected $rule = [
 		'id' => 'require',
-		'title' => 'require',
-		'pid' => 'require',
 		'name' => 'require',
-		'url' => 'require',
-		'node' => 'require',
+		'desc' => 'require',
 		'__token__' => 'require|token'
 	];
 
 	protected $message = [
 		'id.require' => '{%id_required}',
-		'title.require' => '{%title_required}',
-		'pid.require' => '{%parent_required}',
 		'name.require' => '{%name_required}',
-		'url.require' => '{%url_required}',
-		'node.require' => '{%node_required}',
+		'desc.require' => '{%desc_required}',
 		'__token__.require' => '{%token_required}',
 	];
 
 	protected $scene = [
-		'add' => ['title', 'pid', 'name', 'node', '__token__'],
-		'edit' => ['id', 'title', 'pid', 'name', 'node', '__token__'],
-		'move' => ['id', 'pid', '__token__'],
+		'add' => ['name', 'desc', '__token__'],
+		'edit' => ['id', 'name', 'desc', '__token__'],
 	];
 }

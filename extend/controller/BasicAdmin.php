@@ -186,8 +186,8 @@ class BasicAdmin extends Controller {
 			if ($this->request->isAjax()) {
 //				return $this->success(lang('get_success'), '', $result);
 				return json([
-					'code' => 0,
-					'msg' => ($result['total'] > 0 ? lang('get_success') : lang('not_data')),
+					'code' => (count($result['list']) > 0 ? 0 : -1),
+					'msg' => (count($result['list']) > 0 ? lang('get_success') : lang('not_data')),
 					'data' => $result['list'],
 					'count' => $result['total'],
 				]);

@@ -1,42 +1,89 @@
-<title>系统菜单</title>
+<style type="text/css">
+	.layui-tab-content { padding: 20px 0 0 0; }
+	.layui-table { border: none !important; }
+	.layui-input { width: auto; height: 28px; line-height: 28px; }
+	.full-width { min-width: 150px !important;}
+</style>
+
+<title>系统节点</title>
 
 <div class="layui-card layadmin-header">
 	<div class="layui-breadcrumb" lay-filter="breadcrumb">
 		<a lay-href="">系统</a>
-		<a><cite>系统菜单</cite></a>
+		<a><cite>系统节点</cite></a>
 	</div>
 </div>
 
 <div class="layui-fluid">
 	<div class="layui-card">
-		<div class="layui-card-body">
-			<script type="text/html" id="table-header-operation">
-				<div class="layui-btn-container">
-					<button class="layui-btn layui-btn-sm" lay-event="add">添加菜单</button>
-				</div>
-			</script>
-			<table id="content-list-tree" lay-filter="content-list-tree"></table>
-			<script type="text/html" id="table-content-tree">
-				<div class="layui-table-tree-icon">
-					{{#if(d.id != d.ids){}}
-					<i class="layui-icon layui-icon-triangle-r" data-sub-show style="display: none;"></i>
-					<i class="layui-icon layui-icon-triangle-d" data-sub-hide></i>
-					{{#}}}
-				</div>
-				{{d.spl}}{{d.title}}
-			</script>
-			<script type="text/html" id="table-content-status">
-				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{d.status == 1 ? 'checked' : ''}}>
-			</script>
-			<script type="text/html" id="table-content-operation">
-				<div class="layui-btn-group">
-					{{#if(d.level < 2){}}
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="add">添加下级</button>
-					{{#}else{}}
-					<button class="layui-btn layui-btn-xs layui-btn-disabled">添加下级</button>
-					{{#}}}
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
-					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+		<div class="layui-card-body" >
+			<script type="text/html" template lay-url="/admin/system.node/index" lay-done="layui.data.node(d);">
+				{{#var data=d.data.groups,lang=d.data.lang;}}
+				<div class="layui-tab layui-form" lay-filter="node">
+					<ul class="layui-tab-title">
+						{{#layui.each(data, function(index,item){}}
+						<li lay-id="{{index}}">{{lang[index+'_node']}}</li>
+						{{#});}}
+						<button class="layui-btn layui-btn-sm" data-clear style="float:right;"><i class="layui-icon layui-icon-refresh-1"></i> {{lang.clear_invalid_record}}</button>
+					</ul>
+					<div class="layui-tab-content">
+						{{#layui.each(data, function(index,groups){}}
+						<div class="layui-tab-item">
+							{{#if(groups.length>0){}}
+							<table class="layui-table" lay-skin="line">
+								{{#layui.each(groups, function(k,vo){}}
+								<tr>
+									<td>
+										{{vo.spl}}{{vo.node}}&nbsp;
+										<div class="layui-input-inline">
+											<input type="text" name="name" class="layui-input" value="{{vo.name}}"/>
+											<input type="hidden" name="node" value="{{vo.node}}"/>
+											<input type="hidden" name="group" value="{{index}}"/>
+										</div>
+									</td>
+									<td>
+										{{#if(vo.level==1){}}
+										<div class="layui-input-inline">
+											<input type="checkbox" lay-filter="is-login-group" lay-skin="primary" title="{{lang.all_add_login_control}}" data-login-group="{{vo.node}}" />
+										</div>
+										{{#}else if(vo.level==2){}}
+										<span class="color-desc">&nbsp;├&nbsp;&nbsp;</span>
+										<div class="layui-input-inline">
+											{{#if(vo.is_login==1){}}
+											<input type="checkbox" name="is_login" lay-filter="is-login" lay-skin="primary" value="1" title="{{lang.add_login_control}}" data-login="{{vo.p_node}}" data-id="login_{{k}}" data-k="{{k}}" checked />
+											{{#}else{}}
+											<input type="checkbox" name="is_login" lay-filter="is-login" lay-skin="primary" value="1" title="{{lang.add_login_control}}" data-login="{{vo.p_node}}" data-id="login_{{k}}" data-k="{{k}}" />
+											{{#}}}
+										</div>
+										{{#}}}
+									</td>
+									<td>
+										{{#if(vo.level==1){}}
+										<div class="layui-input-inline">
+											<input type="checkbox" lay-filter="is-auth-group" lay-skin="primary" title="{{lang.all_add_auth_control}}" data-auth-group="{{vo.node}}" />
+										</div>
+										{{#}else if(vo.level==2){}}
+										<span class="color-desc">&nbsp;├&nbsp;&nbsp;</span>
+										<div class="layui-input-inline">
+											{{#if(vo.is_auth==1){}}
+											<input type="checkbox" name="is_auth" lay-filter="is-auth" lay-skin="primary" value="1" title="{{lang.add_auth_control}}" data-auth="{{vo.p_node}}" data-id="auth_{{k}}" data-k="{{k}}" checked />
+											{{#}else{}}
+											<input type="checkbox" name="is_auth" lay-filter="is-auth" lay-skin="primary" value="1" title="{{lang.add_auth_control}}" data-auth="{{vo.p_node}}" data-id="auth_{{k}}" data-k="{{k}}" />
+											{{#}}}
+										</div>
+										{{#}}}
+									</td>
+									<td class="loading-tips nowrap full-width">
+										<p class="save_loading" style="display:none;color:#5FB878;"><i class="layui-icon layui-icon-loading"></i> {{lang.save_loading}}</p>
+										<p class="save_error" style="display:none;color:#FF5722;"><i class="layui-icon layui-icon-close"></i> {{lang.save_error}}</p>
+									</td>
+								</tr>
+								{{#});}}
+							</table>
+							{{#}}}
+						</div>
+						{{#});}}
+					</div>
 				</div>
 			</script>
 		</div>
@@ -44,36 +91,134 @@
 </div>
 
 <script>
-	layui.use('list_tree', layui.factory('list_tree')).use(['admin', 'list_tree', 'table'], function(){
+	layui.use(['admin', 'form', 'element'], function () {
 		var $ = layui.$,
 			admin = layui.admin,
-			view = layui.view,
-			table = layui.table,
+			element = layui.element,
+			layer = layui.layer,
 			form = layui.form;
-
-		layui.setter['controlUrl'] = '/admin/system.node';
-		layui.setter['templateUrl'] = 'system/node';
-
-		admin.req({
-			url: layui.setter.controlUrl + '/index.html',
-			done: function (res) {
-
+		var $body = $('body');
+		// 权限分组状态同步
+		function authGroupSync() {
+			$('[data-auth-group]').map(function () {
+				var node = this.getAttribute('data-auth-group'), checked = true;
+				$('[data-auth="' + node + '"]').map(function () {
+					this.checked || (checked = false);
+				});
+				this.checked = checked;
+			});
+		}
+		// 登录分组状态同步
+		function loginGroupSync() {
+			$('[data-login-group]').map(function () {
+				var node = this.getAttribute('data-login-group'), checked = true;
+				$('[data-login="' + node + '"]').map(function () {
+					this.checked || (checked = false);
+				});
+				this.checked = checked;
+			});
+		}
+		// 数据自动更新
+		function update(self) {
+			var $item = $(self).parents('tr'), data = new Object();
+			$item.find('input').map(function () {
+				if (this.name) {
+					switch (this.type) {
+						case 'text':
+							data[this.name] = this.value;
+							break;
+						case 'hidden':
+							data[this.name] = this.value;
+							break;
+						case 'checkbox':
+							data[this.name] = this.checked ? 1 : 0;
+							break;
+					}
+				}
+			});
+			$item.find('.loading-tips').find('.save_error').hide();
+			$item.find('.loading-tips').find('.save_loading').show();
+			admin.req({
+				url: '/admin/system.node/save.html',
+				type: 'post',
+				data: data,
+				success: function (ret) {
+					$item.find('.loading-tips').find('.save_loading').hide();
+					if (ret.code === 1) {
+						return false;
+					} else {
+						$item.find('.loading-tips').find('.save_error').show();
+						return false;
+					}
+				}
+			});
+			loginGroupSync();
+			authGroupSync();
+			form.render('checkbox', 'node');
+		}
+		// check点击事件（权限组）
+		form.on('checkbox(is-auth-group)', function (data) {
+			var checked = !!data.elem.checked, node = data.elem.getAttribute('data-auth-group');
+			if (checked === true) {
+				$('[data-login="' + node + '"]').map(function () {
+					this.checked = true;
+				});
 			}
+			$('[data-auth="' + node + '"]').map(function () {
+				this.checked = checked;
+				update(this);
+			});
+		});
+		// check点击事件（登录组）
+		form.on('checkbox(is-login-group)', function (data) {
+			var checked = !!data.elem.checked, node = data.elem.getAttribute('data-login-group');
+			if (checked === false) {
+				$('[data-auth="' + node + '"]').map(function () {
+					this.checked = false;
+				});
+			}
+			$('[data-login="' + node + '"]').map(function () {
+				this.checked = checked;
+				update(this);
+			});
+		});
+		// check点击事件(权限)
+		form.on('checkbox(is-auth)', function (data) {
+			var checked = !!data.elem.checked, k = data.elem.getAttribute('data-k');
+			if (checked === true) {
+				$('[data-id="login_' + k + '"]').map(function () {
+					this.checked = true;
+				});
+			}
+			update(data.elem);
+		});
+		// check点击事件（登录）
+		form.on('checkbox(is-login)', function (data) {
+			var checked = !!data.elem.checked, k = data.elem.getAttribute('data-k');
+			if (checked === false) {
+				$('[data-id="auth_' + k + '"]').map(function () {
+					this.checked = false;
+				});
+			}
+			update(data.elem);
+		});
+		// 文本框失去焦点事件
+		$body.on('blur', 'input[name="name"]', function () {
+			update(this);
+		});
+		// 清理无效的节点记录
+		$body.on('click', 'button[data-clear]', function () {
+			admin.req({
+				url: '/admin/system.node/clear.html',
+			});
 		});
 
-		// // 表格
-		// table.render({
-		// 	url: layui.setter.controlUrl + '/index.html',
-		// 	cols: [[
-		// 		{type: 'checkbox', fixed: 'left'},
-		// 		{field: 'title', title: '菜单名称', minWidth: 200, toolbar: '#table-content-tree'},
-		// 		{field: 'url', title: '菜单链接', minWidth: 150, align: 'center'},
-		// 		{field: 'node', title: '菜单节点', minWidth: 150, align: 'center'},
-		// 		{field: 'sort', title: '排序', width: 80, align: 'center', edit: true},
-		// 		{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
-		// 		{title: '操作', fixed: 'right', width: 160, align:'center', unresize: true, toolbar: '#table-content-operation'}
-		// 	]],
-		// 	height: 'full-150', // 最大高度
-		// });
+		layui.data.node = function (d) {
+			loginGroupSync();
+			authGroupSync();
+			form.render('checkbox', 'node');
+			element.tabChange('node', 'admin');
+
+		};
 	});
 </script>

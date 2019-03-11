@@ -25,7 +25,7 @@ class Auth extends BasicAdmin {
 	protected $table = 'SystemAuth';
 
 	/**
-	 * 权限列表
+	 * 列表
 	 * @access public
 	 * @return array|string
 	 * @throws \think\db\exception\DataNotFoundException
@@ -38,7 +38,7 @@ class Auth extends BasicAdmin {
 	}
 
 	/**
-	 * 权限添加
+	 * 添加
 	 * @access public
 	 * @return \think\response\View
 	 * @throws \think\Exception
@@ -52,7 +52,7 @@ class Auth extends BasicAdmin {
 	}
 
 	/**
-	 * 权限编辑
+	 * 编辑
 	 * @access public
 	 * @return \think\response\View
 	 * @throws \think\Exception

@@ -163,13 +163,13 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 			admin.req({
 				url: layui.setter.controlUrl + '/enables.html',
 				type: 'post',
-				data: {id : this.value, field: 'status'},
+				data: {id : this.value, field: 'status', value: 1},
 			});
 		} else { // 禁用
 			admin.req({
 				url: layui.setter.controlUrl + '/disables.html',
 				type: 'post',
-				data: {id : this.value, field: 'status'},
+				data: {id : this.value, field: 'status', value: 0},
 			});
 		}
 	});

@@ -1,0 +1,80 @@
+<div class="layui-card-header"></div>
+<div class="layui-card-body">
+	<div class="layui-form layui-col-md11" lay-filter="form">
+		<script type="text/html" template>
+			{{#var data=d.params,lang=data.otherData.lang;}}
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.username||''}}</label>
+				<div class="layui-input-block">
+					{{#if(!data.username){}}
+					<input type="text" name="username" class="layui-input" lay-verify="" value="{{data.username||''}}" placeholder="{{lang.username_placeholder||''}}" />
+					{{#}else{}}
+					<input type="text" class="layui-input" value="{{data.username||''}}" disabled />
+					{{#}}}
+					<div class="layui-form-mid layui-word-aux">{{lang.username_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.phone||''}}</label>
+				<div class="layui-input-block">
+					<input type="tel" name="phone" class="layui-input" lay-verify="" value="{{data.phone||''}}" placeholder="{{lang.phone_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.phone_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.email||''}}</label>
+				<div class="layui-input-block">
+					<input type="email" name="email" class="layui-input" lay-verify="" value="{{data.email||''}}" placeholder="{{lang.email_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.email_description||''}}</div>
+				</div>
+			</div>
+			{{#if(!data.id){}}
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.password||''}}</label>
+				<div class="layui-input-block">
+					<input type="password" name="password" class="layui-input" lay-verify="" placeholder="{{lang.password_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.password_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.re_password||''}}</label>
+				<div class="layui-input-block">
+					<input type="password" name="re_password" class="layui-input" lay-verify="" placeholder="{{lang.re_password_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.re_password_description||''}}</div>
+				</div>
+			</div>
+			{{#var authorizes=data.otherData.authorizes;}}
+			{{#if(authorizes.length > 0){}}
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.authorize||''}}</label>
+				<div class="layui-input-block">
+					{{#layui.each(authorizes, function(index, item){}}
+					<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}">
+					{{#});}}
+					<p class="help-block color-desc">{{lang.authorize_description||''}}</p>
+				</div>
+			</div>
+			{{#}}}
+			{{#}}}
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.desc||''}}</label>
+				<div class="layui-input-block">
+					<textarea name="desc" class="layui-textarea" placeholder="{{lang.desc_placeholder||''}}">{{data.desc||''}}</textarea>
+					<p class="help-block color-desc">{{lang.desc_description||''}}</p>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<div class="layui-footer">
+						{{#if(data.id){}}<input type="hidden" name="id" lay-verify="required" value="{{data.id||''}}"/>{{#}}}
+						{{data.__token__||''}}
+						<button class="layui-btn" lay-submit lay-filter="form-submit">{{lang.save||''}}</button>
+					</div>
+				</div>
+			</div>
+		</script>
+	</div>
+</div>
+
+<script>
+</script>

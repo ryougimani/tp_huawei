@@ -1,6 +1,5 @@
-
-<script type="text/html" template lay-done="layui.data.form(d);">
-	<div class="layui-form layui-col-md11" lay-filter="form">
+<div class="layui-form layui-col-md11" lay-filter="form">
+	<script type="text/html" template>
 		{{#var data=d.params,lang=data.otherData.lang;}}
 		<div class="layui-form-item">
 			<label class="layui-form-label">{{lang.username||''}}</label>
@@ -14,9 +13,7 @@
 			<label class="layui-form-label">{{lang.authorize||''}}</label>
 			<div class="layui-input-block">
 				{{#layui.each(authorizes, function(index, item){}}
-
 				<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}">
-
 				{{#});}}
 				<p class="help-block color-desc">{{lang.authorize_description||''}}</p>
 			</div>
@@ -31,21 +28,5 @@
 				</div>
 			</div>
 		</div>
-	</div>
-</script>
-
-<script>
-	layui.use(['admin', 'form'], function () {
-		var $ = layui.$,
-			admin = layui.admin,
-			element = layui.element,
-			layer = layui.layer,
-			form = layui.form;
-
-
-		layui.data.form = function (d) {
-			form.render(null, 'form');
-
-		};
-	});
-</script>
+	</script>
+</div>

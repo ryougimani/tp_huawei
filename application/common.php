@@ -23,6 +23,20 @@ function auth($node, $check = true) {
 }
 
 /**
+ * 是否存在此节点方法
+ * @param string $node
+ * @return bool
+ */
+function is_exist_action($node) {
+	list($module, $controller, $action) = explode('/', str_replace(['?', '=', '&'], '/', $node . '///'));
+	$controller = explode('.', $controller);
+	$controller[count($controller) - 1] = parse_name(end($controller), 1);
+	$className = env('app_namespace') . '\\' . $module . '\\controller\\' . implode('\\', $controller);
+	if (!class_exists($className)) return false;
+	return in_array($action, get_class_methods($className));
+}
+
+/**
  * 获取或设置系统参数
  * @param string $name 参数名称
  * @param bool $value 默认是false为获取值，否则为更新
@@ -58,6 +72,51 @@ function password_encode($password, $code){
 	return md5(md5($password).$code);
 }
 
+/**
+ * 汉字转换拼音
+ * @param string $chinese 中文字符
+ * @param bool $is_initial 是否首字母
+ * @param string $delimiter 分割符
+ * @return mixed|Pinyin|string
+ */
+function get_pinyin($chinese, $is_initial = false, $delimiter = '-') {
+	$pinyin = new Pinyin();
+	if ($is_initial) {
+		$result = $pinyin->abbr($chinese, $delimiter);
+	} else {
+		$result = $pinyin->permalink($chinese, $delimiter);
+	}
+	return $result;
+}
+
+/**
+ * 去首尾空格
+ * @param $str
+ * @return false|string
+ */
+function mb_trim($str) {
+	$str = mb_ereg_replace('^(([ \r\n\t])*(　)*)*', '', $str);
+	$str = mb_ereg_replace('(([ \r\n\t])*(　)*)*$', '', $str);
+	return $str;
+}
+
+/**
+ * 替换图片路径标识
+ * @param $img
+ * @return mixed
+ */
+function img_replace($img){
+	return str_replace('\\','/',$img);
+}
+
+/**
+ * 安全URL编码
+ * @param array|string $data
+ * @return string
+ */
+function encode($data) {
+	return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(serialize($data)));
+}
 
 /**
  * 时间格式
@@ -95,4 +154,17 @@ function format_time($time) {
 	}
 	return false;
 }
+
+/**
+ * 格式化字节大小
+ * @param  number $size 字节数
+ * @param  string $delimiter 数字和单位分隔符
+ * @return string
+ */
+function format_bytes($size, $delimiter = '') {
+	$units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
+	for ($i = 0; $size >= 1024 && $i < 5; $i++) $size /= 1024;
+	return round($size, 2) . $delimiter . $units[$i];
+}
+
 
