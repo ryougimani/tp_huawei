@@ -1,0 +1,65 @@
+<script type="text/html" template lay-done="layui.data.data_form(d);">
+	{{#var data=d.params.data,lang=d.params.lang;}}
+	<div class="layui-card-header">{{#if(!data.id){}}{{lang.add_title}}{{#}else{}}{{lang.edit_title}}{{#}}}</div>
+	<div class="layui-card-body layui-row">
+		<div class="layui-form layui-col-md11" lay-filter="form" style="margin-top: 20px;">
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.name||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" name="name" class="layui-input" lay-verify="" value="{{data.name||''}}" placeholder="{{lang.name_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.name_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.class||''}}</label>
+				<div class="layui-input-block">
+					<select name="class_id">
+						{{#layui.each(d.params.other_data.classes,function(index, item){ if(data.class_id==item.id){}}
+						<option value="{{item.id}}" selected>{{item.spl}}{{item.name}}</option>
+						{{#}else{}}
+						<option value="{{item.id}}">{{item.spl}}{{item.name}}</option>
+						{{#} });}}
+					</select>
+					<div class="layui-form-mid layui-word-aux">{{lang.class_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.image||''}}</label>
+				<div class="layui-input-block">
+					<div class="layui-upload">
+						<input type="hidden" name="image" value="{{data.image||''}}" id="upload-images-one-save" />
+						<button type="button" class="layui-btn" id="upload-images-one">{{lang.upload_image||''}}</button>
+						<div class="layui-upload-list">
+							<img class="layui-upload-img" id="upload-images-one-img" src="{{data.image||''}}">
+							<p id="upload-images-one-text"></p>
+						</div>
+					</div>
+					<div class="layui-form-mid layui-word-aux">{{lang.link_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.link||''}}</label>
+				<div class="layui-input-block">
+					<input type="tel" name="link" class="layui-input" lay-verify="" value="{{data.link||''}}" placeholder="{{lang.link_placeholder||''}}" />
+					<div class="layui-form-mid layui-word-aux">{{lang.link_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<div class="layui-footer">
+						{{#if(data.id){}}<input type="hidden" name="id" lay-verify="required" value="{{data.id||''}}"/>{{#}}}
+						{{data.__token__||''}}
+						<button class="layui-btn" lay-submit lay-filter="form-submit">{{lang.save||''}}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script>
+	layui.data.data_form = function(d) {
+		layui.use('data_form', layui.factory('data_form')).use(['admin', 'data_form'], function(){
+
+		});
+	};
+</script>

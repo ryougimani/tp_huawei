@@ -4,8 +4,18 @@ return [
 	'search' => '搜索',
 	'not_data' => '暂无符合条件的数据记录',
 	// form
+	'base' => '基础',
+	'seo' => 'SEO',
+	'through' => '通过',
+	'no_through' => '不通过',
+	'upload_image' => '上传图片',
+	'delete_image' => '删除图片',
+	'upload_file' => '上传文件',
+	'delete_file' => '删除文件',
 	'save' => '保存数据',
 	'cancel' => '取消编辑',
+	'no_operate_data' => '没有可操作数据',
+	'query_key' => '关键字',
 	// time
 	'second_ago' => '秒前',
 	'minute_ago' => '分钟前',
@@ -32,4 +42,5 @@ return [
 	'restore_error' => '还原失败，请稍候再试！',
 	// field
 	'id' => 'ID',
+	'all_class' => '全部分类',
 ];

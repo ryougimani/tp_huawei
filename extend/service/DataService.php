@@ -137,7 +137,7 @@ class DataService {
 		list($field, $value) = [$request->post('field', ''), $request->post('value', '')];
 		$map[] = empty($pk) ? ['id', 'in', explode(',', $request->post('id', ''))] : [$pk, 'in', explode(',', $request->post($pk, ''))];
 		// 删除模式，如果存在 is_deleted 字段使用软删除
-		if ($field === 'delete') {
+		if ($field === 'del') {
 			if (in_array('is_deleted', $fields)) {
 				return Db::table($table)->where($where)->where($map)->update(['is_deleted' => '1']) !== false;
 			}
@@ -150,7 +150,7 @@ class DataService {
 			}
 		}
 		// 彻底删除
-		if ($field === 'thorough_delete') {
+		if ($field === 'thorough_del') {
 			return Db::table($table)->where($where)->where($map)->delete() !== false;
 		}
 		// 更新模式，更新指定字段内容

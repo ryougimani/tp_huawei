@@ -1,43 +1,44 @@
-<script type="text/html" template>
-	<link rel="stylesheet" href="{{layui.setter.base}}style/tableFilter.css?v={{layui.admin.v}}-1" media="all">
-</script>
-
-<title>系统角色</title>
-
+<title>用户角色</title>
 <div class="layui-card layadmin-header">
 	<div class="layui-breadcrumb" lay-filter="breadcrumb">
-		<a lay-href="">系统</a>
-		<a><cite>系统角色</cite></a>
+		<a><cite>主页</cite></a>
+		<a><cite>用户</cite></a>
+		<a><cite>用户角色</cite></a>
 	</div>
 </div>
-
 <div class="layui-fluid">
 	<div class="layui-card">
 		<div class="layui-card-body">
-			<script type="text/html" id="table-header-operation">
-				<div class="layui-btn-container">
-					<button class="layui-btn layui-btn-sm" lay-event="add">添加角色</button>
-				</div>
-			</script>
 			<table id="content-list" lay-filter="content-list"></table>
-			<script type="text/html" id="table-content-status">
-				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{d.status == 1 ? 'checked' : ''}}>
-			</script>
-			<script type="text/html" id="table-content-operation">
-				<div class="layui-btn-group">
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
-					{{#if(d.id != 1) {}}
-					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
-					{{#} else {}}
-					<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
-					{{#}}}
-				</div>
-			</script>
 		</div>
 	</div>
 </div>
-
+<!--表头工具栏 start-->
+<script type="text/html" id="table-header-operation">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+		<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</button>
+	</div>
+</script>
+<!--表头工具栏 end-->
+<!--状态 start-->
+<script type="text/html" id="table-content-status">
+	<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{#if(d.status==1){}}checked{{#}}} {{#if(d.is_deleted==1){}}disabled{{#}}} />
+</script>
+<!--状态 end-->
+<!--操作 start-->
+<script type="text/html" id="table-content-operation">
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
+		{{#if(d.id!=1){}}
+		<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+		{{#}else{}}
+		<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
+		{{#}}}
+	</div>
+</script>
+<!--操作 end-->
 <script>
 	layui.use('list', layui.factory('list')).use(['admin', 'list'], function(){
 		var $ = layui.$,
@@ -58,6 +59,7 @@
 				{field: 'name', title: '角色名称', minWidth: 200, align: 'center'},
 				{field: 'desc', title: '角色描述', minWidth: 150, align: 'center'},
 				{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
+				{field: 'update_time', title: '更新时间', width: 160, align: 'center', unresize: true},
 				{title: '操作', fixed: 'right', width: 140, align:'center', unresize: true, toolbar: '#table-content-operation'}
 			]],
 			height: 'full-150', // 最大高度

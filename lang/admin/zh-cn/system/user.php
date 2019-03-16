@@ -1,5 +1,10 @@
 <?php
 return [
+	//title
+	'add_title' => '添加用户',
+	'edit_title' => '编辑用户',
+	'password_title' => '修改密码',
+	'auth_title' => '设置权限',
 	// field
 	'username' => '用户账号',
 	'username_placeholder' => '请填写用户账号',

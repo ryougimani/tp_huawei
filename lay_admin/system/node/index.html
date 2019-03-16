@@ -2,23 +2,23 @@
 	.layui-tab-content { padding: 20px 0 0 0; }
 	.layui-table { border: none !important; }
 	.layui-input { width: auto; height: 28px; line-height: 28px; }
-	.full-width { min-width: 150px !important;}
+	.layui-table td, .layui-table th { padding: 15px 10px !important; font-size: 12px !important; }
+	.layui-table .layui-input-inline { vertical-align: initial; }
+	.full-width { min-width: 90px !important;}
 </style>
-
 <title>系统节点</title>
-
 <div class="layui-card layadmin-header">
 	<div class="layui-breadcrumb" lay-filter="breadcrumb">
-		<a lay-href="">系统</a>
+		<a><cite>主页</cite></a>
+		<a><cite>系统</cite></a>
 		<a><cite>系统节点</cite></a>
 	</div>
 </div>
-
 <div class="layui-fluid">
 	<div class="layui-card">
 		<div class="layui-card-body" >
 			<script type="text/html" template lay-url="/admin/system.node/index" lay-done="layui.data.node(d);">
-				{{#var data=d.data.groups,lang=d.data.lang;}}
+				{{#var data=d.data,lang=d.lang;}}
 				<div class="layui-tab layui-form" lay-filter="node">
 					<ul class="layui-tab-title">
 						{{#layui.each(data, function(index,item){}}
@@ -92,12 +92,12 @@
 
 <script>
 	layui.use(['admin', 'form', 'element'], function () {
-		var $ = layui.$,
+		let $ = layui.$,
 			admin = layui.admin,
 			element = layui.element,
 			layer = layui.layer,
 			form = layui.form;
-		var $body = $('body');
+		let $body = $('body');
 		// 权限分组状态同步
 		function authGroupSync() {
 			$('[data-auth-group]').map(function () {
@@ -120,7 +120,7 @@
 		}
 		// 数据自动更新
 		function update(self) {
-			var $item = $(self).parents('tr'), data = new Object();
+			let $item = $(self).parents('tr'), data = new Object();
 			$item.find('input').map(function () {
 				if (this.name) {
 					switch (this.type) {
@@ -158,7 +158,7 @@
 		}
 		// check点击事件（权限组）
 		form.on('checkbox(is-auth-group)', function (data) {
-			var checked = !!data.elem.checked, node = data.elem.getAttribute('data-auth-group');
+			let checked = !!data.elem.checked, node = data.elem.getAttribute('data-auth-group');
 			if (checked === true) {
 				$('[data-login="' + node + '"]').map(function () {
 					this.checked = true;
@@ -171,7 +171,7 @@
 		});
 		// check点击事件（登录组）
 		form.on('checkbox(is-login-group)', function (data) {
-			var checked = !!data.elem.checked, node = data.elem.getAttribute('data-login-group');
+			let checked = !!data.elem.checked, node = data.elem.getAttribute('data-login-group');
 			if (checked === false) {
 				$('[data-auth="' + node + '"]').map(function () {
 					this.checked = false;
@@ -184,7 +184,7 @@
 		});
 		// check点击事件(权限)
 		form.on('checkbox(is-auth)', function (data) {
-			var checked = !!data.elem.checked, k = data.elem.getAttribute('data-k');
+			let checked = !!data.elem.checked, k = data.elem.getAttribute('data-k');
 			if (checked === true) {
 				$('[data-id="login_' + k + '"]').map(function () {
 					this.checked = true;
@@ -194,7 +194,7 @@
 		});
 		// check点击事件（登录）
 		form.on('checkbox(is-login)', function (data) {
-			var checked = !!data.elem.checked, k = data.elem.getAttribute('data-k');
+			let checked = !!data.elem.checked, k = data.elem.getAttribute('data-k');
 			if (checked === false) {
 				$('[data-id="auth_' + k + '"]').map(function () {
 					this.checked = false;
@@ -203,11 +203,12 @@
 			update(data.elem);
 		});
 		// 文本框失去焦点事件
-		$body.on('blur', 'input[name="name"]', function () {
+		$body.off('blur', 'input[name="name"]').on('blur', 'input[name="name"]', function () {
 			update(this);
 		});
 		// 清理无效的节点记录
-		$body.on('click', 'button[data-clear]', function () {
+		$body.off('click', 'button[data-clear]').on('click', 'button[data-clear]', function () {
+			console.log(1);
 			admin.req({
 				url: '/admin/system.node/clear.html',
 			});

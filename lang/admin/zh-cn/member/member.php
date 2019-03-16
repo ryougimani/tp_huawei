@@ -1,5 +1,11 @@
 <?php
 return [
+	//title
+	'add_title' => '添加用户',
+	'edit_title' => '编辑用户',
+	'password_title' => '修改密码',
+	'auth_title' => '设置权限',
+	// field
 	'username' => '用户账号',
 	'username_placeholder' => '请填写用户账号',
 	'username_description' => '',
@@ -41,12 +47,10 @@ return [
 	'new_password_description' => '',
 	'new_password_required' => '请输入新密码！',
 	'login_num' => '登录次数',
-	'login_time' => '最后登录',
-
+	'login_time' => '最后登录时间',
+	// list
 	'not_phone' => '<span style="color:#ccc">还没有设置手机号</span>',
 	'not_email' => '<span style="color:#ccc">还没有设置邮箱</span>',
 	'not_authorize' => '<span style="color:#ccc">还没有设置权限</span>',
 	'not_login' => '<span style="color:#ccc">从未登录</span>',
-
-	'address' => '地址',
 ];

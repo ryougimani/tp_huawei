@@ -1,0 +1,36 @@
+<script type="text/html" template lay-done="layui.data.data_form(d);">
+	{{#var data=d.params.data,lang=d.params.lang;}}
+	<div class="layui-card-body layui-row">
+		<div class="layui-form layui-col-md11" lay-filter="form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.name||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{{data.name||''}}" />
+					<div class="layui-form-mid layui-word-aux"></div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.audit||''}}</label>
+				<div class="layui-input-block">
+					<input type="radio" name="audit" value="1" title="{{lang.through||''}}">
+					<input type="radio" name="audit" value="-1" title="{{lang.no_through||''}}">
+					<div class="layui-form-mid layui-word-aux">{{lang.audit_description||''}}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<div class="layui-footer">
+						{{#if(data.id){}}<input type="hidden" name="id" lay-verify="required" value="{{data.id||''}}"/>{{#}}}
+						{{data.__token__||''}}
+						<button class="layui-btn" lay-submit lay-filter="form-submit">{{lang.save||''}}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script>
+	layui.data.data_form = function(d) {
+
+	};
+</script>

@@ -1,8 +1,8 @@
-<div class="layui-card-header">系统角色</div>
-<div class="layui-card-body">
-	<div class="layui-form layui-col-md11" lay-filter="form">
-		<script type="text/html" template>
-			{{#var data=d.params,lang=data.otherData.lang;}}
+<script type="text/html" template lay-done="layui.data.data_form(d);">
+	{{#var data=d.params.data,lang=d.params.lang;}}
+	<div class="layui-card-header">{{#if(!data.id){}}{{lang.add_title}}{{#}else{}}{{lang.edit_title}}{{#}}}</div>
+	<div class="layui-card-body layui-row">
+		<div class="layui-form layui-col-md11" lay-filter="form">
 			<div class="layui-form-item">
 				<label class="layui-form-label">{{lang.name||''}}</label>
 				<div class="layui-input-block">
@@ -26,9 +26,11 @@
 					</div>
 				</div>
 			</div>
-		</script>
+		</div>
 	</div>
-</div>
-
+</script>
 <script>
+	layui.data.data_form = function(d) {
+
+	};
 </script>

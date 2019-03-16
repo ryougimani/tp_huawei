@@ -11,7 +11,6 @@ namespace app\admin\controller\system;
 
 use controller\BasicAdmin;
 use think\Db;
-use service\DataService;
 
 /**
  * 系统日志管理
@@ -52,7 +51,7 @@ class Log extends BasicAdmin {
 
 	/**
 	 * 列表数据处理
-	 * @access public
+	 * @access protected
 	 * @param $data
 	 * @throws \Exception
 	 */
@@ -67,24 +66,11 @@ class Log extends BasicAdmin {
 	}
 
 	/**
-	 * 搜索表单
+	 * 其他数据处理
 	 * @access public
+	 * @param $data
 	 */
-	public function search_from() {
-		$actions = Db::name($this->table)->group('action')->column('action');
-		$this->success(lang('get_success'), '', ['lang' => $this->_lang(), 'actions' => $actions]);
-	}
-
-	/**
-	 * 删除操作
-	 * @access public
-	 * @throws \think\Exception
-	 * @throws \think\exception\PDOException
-	 */
-	public function del() {
-		if (DataService::update($this->table)) {
-			$this->success(lang('del_success'), '');
-		}
-		$this->error(lang('del_error'));
+	protected function _other_data_filter(&$data) {
+		$data['actions'] = Db::name($this->table)->group('action')->column('action');
 	}
 }

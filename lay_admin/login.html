@@ -1,44 +1,45 @@
 <script type="text/html" template>
-	<link rel="stylesheet" href="{{ layui.setter.base }}style/login.css?v={{ layui.admin.v }}-1" media="all">
+	<link rel="stylesheet" href="{{ layui.setter.base }}style/login.css?v={{ layui.admin.v }}" media="all">
 </script>
-
-<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
-	<div class="layadmin-user-login-main">
-		<div class="layadmin-user-login-box layadmin-user-login-header">
-			<h2>FirdotAdmin</h2>
-			<p>Firdot 后台管理系统</p>
-		</div>
-		<div class="layadmin-user-login-box layadmin-user-login-body layui-form">
-			<div class="layui-form-item">
-				<label class="layadmin-user-login-icon layui-icon layui-icon-username" for="login-username"></label>
-				<input type="text" name="username" class="layui-input" lay-verify="required" lay-verType="tips" placeholder="用户名" id="login-username" value="admin" />
+<script type="text/html" template id="admin-login-template" lay-url="/admin/login.html" lay-done="layui.data.login(d);">
+	<div class="layadmin-user-login layadmin-user-display-show" id="admin-login" style="display: none;">
+		<div class="layadmin-user-login-main">
+			<div class="layadmin-user-login-box layadmin-user-login-header">
+				<h2>FirdotAdmin</h2>
+				<p>Firdot 后台管理系统</p>
 			</div>
-			<div class="layui-form-item">
-				<label class="layadmin-user-login-icon layui-icon layui-icon-password" for="login-password"></label>
-				<input type="password" name="password" class="layui-input" lay-verify="required" lay-verType="tips" placeholder="密码" id="login-password" value="admin" />
-			</div>
-			<div class="layui-form-item">
-				<div class="layui-row">
-					<div class="layui-col-xs7">
-						<label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="login-captcha"></label>
-						<input type="text" name="captcha" class="layui-input" lay-verify="captcha" lay-verType="tips" placeholder="图形验证码" id="login-captcha" />
-					</div>
-					<div class="layui-col-xs5">
-						<div style="margin-left: 10px; padding: 2px 0;">
-							<img src="/captcha.html" class="layadmin-user-login-codeimg" id="get-captcha">
+			<div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+				<div class="layui-form-item">
+					<label class="layadmin-user-login-icon layui-icon layui-icon-username" for="login-username"></label>
+					<input type="text" name="username" class="layui-input" lay-verify="username" lay-verType="tips" placeholder="{{d.lang.username_placeholder}}" id="login-username" value="admin" />
+				</div>
+				<div class="layui-form-item">
+					<label class="layadmin-user-login-icon layui-icon layui-icon-password" for="login-password"></label>
+					<input type="password" name="password" class="layui-input" lay-verify="password" lay-verType="tips" placeholder="{{d.lang.password_placeholder}}" id="login-password" value="admin" />
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-row">
+						<div class="layui-col-xs7">
+							<label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="login-captcha"></label>
+							<input type="text" name="captcha" class="layui-input" lay-verify="captcha" lay-verType="tips" placeholder="{{d.lang.captcha_placeholder}}" id="login-captcha" />
+						</div>
+						<div class="layui-col-xs5">
+							<div style="margin-left: 10px; padding: 2px 0;">
+								<img src="/captcha.html" class="layadmin-user-login-codeimg" id="get-captcha">
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="layui-form-item">
-				<button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login-submit">登 入</button>
+				<div class="layui-form-item">
+					<button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login-submit">{{d.lang.login}}</button>
+				</div>
 			</div>
 		</div>
+		<div class="layui-trans layadmin-user-login-footer">
+			<p>© 2018 <a href="http://www.firdot.com/" target="_blank">firdot.com</a></p>
+		</div>
 	</div>
-	<div class="layui-trans layadmin-user-login-footer">
-		<p>© 2018 <a href="http://www.firdot.com/" target="_blank">firdot.com</a></p>
-	</div>
-</div>
+</script>
 <script>
 	layui.use(['admin', 'form', 'login'], function () {
 		var $ = layui.$,
@@ -48,11 +49,32 @@
 			router = layui.router(),
 			search = router.search;
 
-		form.render();
+		layui.data.login = function (d) {
+			form.verify({
+				username: function (value, item) {
+					if (value.length === 0)
+						return d.lang['username_required'];
+					if (value.length < 4)
+						return d.lang['username_length'];
+				},
+				password: function (value, item) {
+					if (value.length === 0)
+						return d.lang['password_required'];
+					if (value.length < 4)
+						return d.lang['password_length'];
+				},
+				captcha: function (value, item) {
+					if (value.length === 0)
+						return d.lang['captcha_required'];
+					if (value.length !== 5)
+						return d.lang['captcha_length'];
+				},
+			});
+			$('#admin-login-template').remove();
+		};
 
 		//提交
 		form.on('submit(login-submit)', function (obj) {
-			// console.log(obj.field);
 			admin.req({
 				url: '/admin/login.html',
 				type: 'post',
@@ -64,7 +86,7 @@
 							value: res.data.access_token
 						});
 						//登入成功的提示与跳转
-						layer.msg('登入成功', {
+						layer.msg(res.msg, {
 							offset: '15px',
 							icon: 1,
 							time: 1000

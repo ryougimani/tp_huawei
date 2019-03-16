@@ -1,0 +1,98 @@
+<title>广告分类</title>
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a><cite>主页</cite></a>
+		<a><cite>扩展</cite></a>
+		<a><cite>广告分类</cite></a>
+	</div>
+</div>
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-tab layui-tab-brief" id="content-header-tab" lay-filter="content-header-tab">
+			<ul class="layui-tab-title">
+				<li lay-url="/index.html" class="layui-this">全部</li>
+				<li lay-url="/recycle.html">回收站</li>
+			</ul>
+		</div>
+		<div class="layui-card-body">
+			<table id="content-list-tree" lay-filter="content-list-tree"></table>
+		</div>
+	</div>
+</div>
+<!--表头工具栏 start-->
+<script type="text/html" id="table-header-operation">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+		<button class="layui-btn layui-btn-sm" lay-event="move">移动</button>
+		<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</button>
+	</div>
+</script>
+<script type="text/html" id="table-header-operation-recycle">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="restore">还原</button>
+		<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="thorough_del">彻底删除</button>
+		<button class="layui-btn layui-btn-sm layui-btn-warm" lay-event="empty_trash">清空回收站</button>
+	</div>
+</script>
+<!--表头工具栏 end-->
+<!--第一栏 start-->
+<script type="text/html" id="table-content-tree">
+	<div class="layui-table-tree-icon" data-ids="{{d.ids}}" data-path="{{d.path}}" style="margin-left: {{d.level*20}}px;">
+		{{#if(d.id != d.ids){}}
+		<i class="layui-icon layui-icon-triangle-d" data-sub-state="show"></i>
+		{{#}}}
+	</div>
+	{{d.name}}
+</script>
+<!--第一栏 end-->
+<!--状态 start-->
+<script type="text/html" id="table-content-status">
+	<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{#if(d.status==1){}}checked{{#}}} {{#if(d.is_deleted==1){}}disabled{{#}}} />
+</script>
+<!--状态 end-->
+<!--操作 start-->
+<script type="text/html" id="table-content-operation">
+	{{#if(d.is_deleted==0){}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="add">添加下级</button>
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="move">移动</button>
+		<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+	</div>
+	{{#}else if(d.is_deleted==1){}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="restore">还原</button>
+		<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="thorough_del">彻底删除</button>
+	</div>
+	{{#}}}
+</script>
+<!--操作 end-->
+<script>
+	layui.use('list_tree', layui.factory('list_tree')).use(['admin', 'list_tree', 'table'], function(){
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			laytpl = layui.laytpl,
+			element = layui.element,
+			table = layui.table,
+			form = layui.form;
+
+		layui.setter['controlUrl'] = '/admin/extend.link_class';
+		layui.setter['templateUrl'] = 'extend/link_class';
+
+		// 表格
+		table.render({
+			url: layui.setter.controlUrl + '/index.html',
+			cols: [[
+				{type: 'checkbox', fixed: 'left'},
+				{field: 'name', title: '分类名称', minWidth: 200, toolbar: '#table-content-tree'},
+				{field: 'brname', title: '分类别名', minWidth: 200, align: 'center'},
+				{field: 'sort', title: '排序', width: 80, align: 'center', unresize: true, edit: true},
+				{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
+				{field: 'update_time', title: '更新时间', width: 160, align: 'center', unresize: true},
+				{title: '操作', fixed: 'right', width: 200, align:'center', unresize: true, toolbar: '#table-content-operation'}
+			]],
+			height: 'full-200'
+		});
+	});
+</script>

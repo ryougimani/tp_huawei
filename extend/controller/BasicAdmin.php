@@ -27,7 +27,7 @@ class BasicAdmin extends Controller {
 
 	protected $table; // 默认操作数据表
 	protected $lang_range; // 语言范围
-	protected $title; // 页面标题
+	protected $other_data; // 其他数据
 
 	/**
 	 * 初始化
@@ -37,71 +37,82 @@ class BasicAdmin extends Controller {
 		$this->lang_range = $this->app['lang']->detect();
 	}
 
-//	/**
-//	 * 操作成功跳转的快捷方法
-//	 * @access protected
-//	 * @param  mixed     $msg 提示信息
-//	 * @param  string    $url 跳转的URL地址
-//	 * @param  mixed     $data 返回的数据
-//	 * @param  integer   $wait 跳转等待时间
-//	 * @param  array     $header 发送的Header信息
-//	 * @return void
-//	 */
-//	protected function success($msg = '', $url = null, $data = '', $wait = 3, array $header = []) {
-//		$count = 0;
-//		isset($data['total']) && $count = $data['total'];
-//		isset($data['list']) && $data = $data['list'];
-//		if (is_null($url) && isset($_SERVER["HTTP_REFERER"])) {
-//			$url = $_SERVER["HTTP_REFERER"];
-//		} elseif ('' !== $url) {
-//			$url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : Container::get('url')->build($url);
-//		}
-//		$result = [
-//			'code' => 0,
-//			'msg'  => $msg,
-//			'data' => $data,
-//			'url'  => $url,
-//			'wait' => $wait,
-//			'count' => $count,
-//		];
-//		$type = $this->getResponseType();
-//		if ('html' == strtolower($type)) {
-//			$type = 'jump';
-//		}
-//		$response = Response::create($result, $type)->header($header)->options(['jump_template' => $this->app['config']->get('dispatch_success_tmpl')]);
-//		throw new HttpResponseException($response);
-//	}
-//
-//	/**
-//	 * 操作错误跳转的快捷方法
-//	 * @access protected
-//	 * @param  mixed     $msg 提示信息
-//	 * @param  string    $url 跳转的URL地址
-//	 * @param  mixed     $data 返回的数据
-//	 * @param  integer   $wait 跳转等待时间
-//	 * @param  array     $header 发送的Header信息
-//	 * @return void
-//	 */
-//	protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = []) {
-//		$type = $this->getResponseType();
-//		if (is_null($url)) {
-//			$url = $this->app['request']->isAjax() ? '' : 'javascript:history.back(-1);';
-//		} elseif ('' !== $url) {
-//			$url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : $this->app['url']->build($url);
-//		}
-//		$result = [
-//			'code' => -1,
-//			'msg'  => $msg,
-//			'data' => $data,
-//			'url'  => $url,
-//			'wait' => $wait,
-//		];
-//		if ('html' == strtolower($type)) {
-//			$type = 'jump';
-//		}
-//		$response = Response::create($result, $type)->header($header)->options(['jump_template' => $this->app['config']->get('dispatch_error_tmpl')]);
-//		throw new HttpResponseException($response);
-//	}
+	/**
+	 * 操作成功跳转的快捷方法
+	 * @access protected
+	 * @param array $data 返回的数据
+	 * @param int $count 总数
+	 * @param string $lang 语言包
+	 * @param string $otherData 其他数据
+	 * @param array $header 发送的Header信息
+	 * @return void
+	 */
+	protected function lay_data($data = [], $count = 0, $lang = '', $otherData = '', array $header = []) {
+		if (count($data) > 0) {
+			$result = ['code' => 0, 'msg' => lang('get_success'), 'data' => $data];
+		} else {
+			$result = ['code' => -1, 'msg' => lang('not_data'),];
+		}
+		!empty($lang) && $result['lang'] = $lang;
+		!empty($otherData) && $result['other_data'] = $otherData;
+		throw new HttpResponseException(json($result, 200, $header));
+	}
+
+	/**
+	 * 操作成功跳转的快捷方法
+	 * @access protected
+	 * @param string $msg 提示信息
+	 * @param string $data 返回的数据
+	 * @param string $lang 语言包
+	 * @param string $otherData 其他数据
+	 * @param array $header 发送的Header信息
+	 * @return void
+	 */
+	protected function lay_success($msg = '', $data = '', $lang = '', $otherData = '', array $header = []) {
+		$result = [
+			'code' => 1,
+			'msg'  => $msg,
+			'data' => $data
+		];
+		!empty($lang) && $result['lang'] = $lang;
+		!empty($otherData) && $result['other_data'] = $otherData;
+		throw new HttpResponseException(json($result, 200, $header));
+	}
+
+	/**
+	 * 操作错误跳转的快捷方法
+	 * @access protected
+	 * @param string $msg 提示信息
+	 * @param array $header 发送的Header信息
+	 * @return void
+	 */
+	protected function lay_error($msg = '', array $header = []) {
+		$result = [
+			'code' => -1,
+			'msg'  => $msg
+		];
+		$type = $this->getResponseType();
+		if ('html' == strtolower($type)) {
+			$type = 'jump';
+		}
+		$response = Response::create($result, $type)->header($header)->options(['jump_template' => $this->app['config']->get('dispatch_error_tmpl')]);
+		throw new HttpResponseException($response);
+	}
+
+	/**
+	 * 返回当前语言包
+	 * @access protected
+	 * @param array $lang
+	 * @return array
+	 */
+	protected function _lang($lang = []) {
+		list($module, $controller) = [parse_name($this->request->module()), parse_name($this->request->controller())];
+		$langModule = env('root_path') . 'lang' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $this->lang_range . DIRECTORY_SEPARATOR . 'common.php';
+		file_exists($langModule) && $lang = array_merge($lang, require($langModule));
+		$langController = env('root_path') . 'lang' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $this->lang_range . DIRECTORY_SEPARATOR . preg_replace('/\./', DIRECTORY_SEPARATOR, $controller) . '.php';
+		file_exists($langController) && $lang = array_merge($lang, require($langController));
+		return $lang;
+	}
 
 	/**
 	 * 当前对象回调方法
@@ -118,21 +129,6 @@ class BasicAdmin extends Controller {
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * 返回当前语言包
-	 * @access protected
-	 * @param array $lang
-	 * @return array
-	 */
-	protected function _lang($lang = []) {
-		list($module, $controller) = [parse_name($this->request->module()), parse_name($this->request->controller())];
-		$langModule = env('root_path') . 'lang' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $this->lang_range . DIRECTORY_SEPARATOR . 'common.php';
-		file_exists($langModule) && $lang = array_merge($lang, require($langModule));
-		$langController = env('root_path') . 'lang' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $this->lang_range . DIRECTORY_SEPARATOR . preg_replace('/\./', DIRECTORY_SEPARATOR, $controller) . '.php';
-		file_exists($langController) && $lang = array_merge($lang, require($langController));
-		return $lang;
 	}
 
 	/**
@@ -183,17 +179,8 @@ class BasicAdmin extends Controller {
 		}
 		// 列表数据处理
 		if (false !== $this->_callback('_data_filter', $result['list'], []) && $isDisplay) {
-			if ($this->request->isAjax()) {
-//				return $this->success(lang('get_success'), '', $result);
-				return json([
-					'code' => (count($result['list']) > 0 ? 0 : -1),
-					'msg' => (count($result['list']) > 0 ? lang('get_success') : lang('not_data')),
-					'data' => $result['list'],
-					'count' => $result['total'],
-				]);
-			} else {
-				return view($template, $result);
-			}
+			$this->_callback('_other_data_filter', $other_data, []);
+			$this->lay_data($result['list'], $result['total'], $this->_lang(), $other_data);
 		}
 		return $result;
 	}
@@ -239,9 +226,59 @@ class BasicAdmin extends Controller {
 		} else {
 			// 非POST请求, 获取数据并显示表单页面
 			$data = ($pkValue !== null) ? array_merge((array)$db->where($pk, $pkValue)->where($where)->find(), $extendData) : $extendData;
-			$data['__token__'] = token();
 			if (false !== $this->_callback('_form_filter', $data, [])) {
-				return $this->success(lang('get_success'), '', $data);
+				$this->_callback('_other_data_filter', $other_data, $data);
+				$data['__token__'] = token();
+				$this->lay_success('', $data, $this->_lang(), $other_data);
+			}
+			return $data;
+		}
+	}
+
+	/**
+	 * 批量表单集成处理方法
+	 * @access protected
+	 * @param \think\db\Query|string $dbQuery 数据库查询对象
+	 * @param string $template 模板
+	 * @param string $pkField 主键
+	 * @param array $where 查询规则
+	 * @param array $extendData 扩展数据
+	 * @return array|\think\response\View
+	 * @throws \think\Exception
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 * @throws \think\exception\PDOException
+	 */
+	protected function _form_batch($dbQuery = null, $template = 'form', $pkField = '', $where = [], $extendData = []) {
+		$db = is_null($dbQuery) ? Db::name($this->table) : (is_string($dbQuery) ? Db::name($dbQuery) : $dbQuery);
+		// 获取主键名称与值
+		$pk = empty($pkField) ? ($db->getPk() ? $db->getPk() : 'id') : $pkField;
+		$pkValue = $this->request->request($pk, isset($where[$pk]) ? $where[$pk] : (isset($extendData[$pk]) ? $extendData[$pk] : null));
+		if ($this->request->isPost()) {
+			// POST请求, 数据自动存库
+			$data = array_merge($this->request->post(), $extendData);
+			//$update = $data; unset($update[$pk]);
+			if (false !== $this->_callback('_form_batch_filter', $data, [])) {
+				$result = DataService::save($dbQuery, $data, $pk, $where);
+				//$result = $db->where($pk, 'in', $pkValue)->where($where)->update($update);
+				if (false !== $this->_callback('_form_batch_result', $data, $result)) {
+					if ($result !== false) {
+						LogService::write('数据操作成功', json_encode($data));
+						$this->success(lang('operate_success'), '');
+					}
+					LogService::write('数据操作失败', json_encode($data));
+					$this->error(lang('operate_error'));
+				}
+			}
+		} else {
+			// 非POST请求, 获取数据并显示表单页面
+			$data = ($pkValue !== null) ? ToolsService::rowToCol($db->where($pk, 'in', $pkValue)->where($where)->select(), $extendData) : $extendData;
+			if (false !== $this->_callback('_form_batch_filter', $data, [])) {
+				$this->_callback('_other_data_filter', $other_data, $data);
+				$data['id'] = implode(',', $data['id']);
+				$data['__token__'] = token();
+				$this->lay_success('', $data, $this->_lang(), $other_data);
 			}
 			return $data;
 		}
@@ -271,12 +308,29 @@ class BasicAdmin extends Controller {
 	}
 
 	/**
-	 * 搜索表单集成处理方法
+	 * 修改集成处理方法
 	 * @access protected
-	 * @param array $data
+	 * @param \think\db\Query|string $dbQuery 数据库查询对象
+	 * @throws \think\Exception
+	 * @throws \think\exception\PDOException
 	 */
-	protected function _search_from($data = []) {
-		$this->success(lang('get_success'), '', array_merge(['lang' => $this->_lang()], $data));
+	protected function _empty_trash($dbQuery = null) {
+		$db = is_null($dbQuery) ? Db::name($this->table) : (is_string($dbQuery) ? Db::name($dbQuery) : $dbQuery);
+		list($table, $fields) = [$db->getTable(), $db->getTableFields()];
+		$data = [];
+		if ($this->request->isPost()) {
+			if (in_array('is_deleted', $fields)) {
+				if ($count = $db->where('is_deleted', 1)->count('id')) {
+					$data = $db->where('is_deleted', 1)->column('id');
+					if (Db::table($table)->where('is_deleted', 1)->delete() !== false) {
+						LogService::write('清空回收站成功', json_encode($data));
+						$this->success(lang('empty_success'), '');
+					}
+				}
+			}
+		}
+		LogService::write('清空回收站失败', json_encode($data));
+		$this->error(lang('empty_error'));
 	}
 
 	/**
@@ -317,5 +371,42 @@ class BasicAdmin extends Controller {
 			array_unshift($data, [$key => $firstValue, $pk => '']);
 		}
 		return $data;
+	}
+
+	/**
+	 * 生成自身树形下拉选择框内容
+	 * @access protected
+	 * @param array $data 当前数据
+	 * @param \think\db\Query|string $dbQuery 数据库查询对象
+	 * @param string $firstValue 首行值
+	 * @param string $key
+	 * @param int $root
+	 * @return array|\PDOStatement|string|\think\Collection
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 */
+	protected function _form_this_tree_select(&$data, $dbQuery = null, $firstValue = '', $key = 'name', $root = -1) {
+		empty($firstValue) && $firstValue = lang('top_class');
+		$select_data = $this->_form_select($dbQuery, true, $firstValue, $key, $root);
+		if (isset($data['pid']) && isset($data['id'])) {
+			foreach ($select_data as $key => &$select_item) {
+				if (is_array($data['pid'])) {
+					foreach ($data['pid'] as $k => $v) {
+						$current_path = "-{$data['pid'][$k]}-{$data['id'][$k]}";
+						if ($data['pid'][$k] !== '' && (stripos("{$select_item['path']}-", "{$current_path}-") !== false || $select_item['path'] === $current_path)) {
+							unset($select_data[$key]);
+							break;
+						}
+					}
+				} else {
+					$current_path = "-{$data['pid']}-{$data['id']}";
+					if ($data['pid'] !== '' && (stripos("{$select_item['path']}-", "{$current_path}-") !== false || $select_item['path'] === $current_path)) {
+						unset($select_data[$key]);
+					}
+				}
+			}
+		}
+		return $select_data;
 	}
 }

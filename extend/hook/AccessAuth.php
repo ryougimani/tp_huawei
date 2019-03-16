@@ -49,7 +49,7 @@ class AccessAuth {
 				!empty($access_token) && session_id($access_token);
 				// 登录状态检查
 				if (!empty($access['is_login']) && !session('admin')) {
-					$msg = ['code' => 0, 'msg' => lang('not_logged'), 'url' => url('@admin')];
+					$msg = ['code' => 1001, 'msg' => lang('not_logged'), 'url' => url('@admin')];
 					throw new HttpResponseException($request->isAjax() ? json($msg) : redirect($msg['url']));
 				}
 			} else { // 前台模块

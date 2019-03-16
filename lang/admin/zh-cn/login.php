@@ -1,6 +1,5 @@
 <?php
 return [
-	'login_title' => '用户登录',
 	'username_placeholder' => '用户账号',
 	'username_required' => '请输入用户账号！',
 	'username_length' => '账号长度不能少于4位有效字符！',
@@ -9,12 +8,11 @@ return [
 	'password_length' => '密码长度不能少于4位有效字符！',
 	'captcha_placeholder' => '验证码',
 	'captcha_required' => '请填写验证码',
-	'captcha_regex' => '验证码为5位字符',
-	'input_regex' => '请输入4位及以上的字符',
+	'captcha_length' => '验证码为5位字符',
 	'login' => '登入',
 	'captcha_check_error' => '验证码不匹配！',
-	'not_username_error' => '登录账号不存在，请重新输入!',
-	'neq_password_error' => '登录密码与账号不匹配，请重新输入!',
+	'not_username_error' => '账号不存在，请重新输入!',
+	'neq_password_error' => '密码与账号不匹配，请重新输入!',
 	'login_success' => '登录成功，正在进入系统...',
 	'logout_success' => '退出登录成功！',
 ];

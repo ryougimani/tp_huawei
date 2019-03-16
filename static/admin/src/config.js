@@ -48,9 +48,11 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     
     //扩展的第三方模块
     ,extend: [
-      'echarts', //echarts 核心包
-      'echartsTheme', //echarts 主题
-      'tableFilter'
+      'echarts' //echarts 核心包
+      ,'echartsTheme' //echarts 主题
+      ,'treeGrid'
+      ,'treetable'
+      ,'tableFilter'
     ]
     
     //主题配置
@@ -136,6 +138,12 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     }
 
     //自定义
+    ,listTable: {
+
+    }
+    ,upload: {
+      size: 60
+    }
 	,popupArea: '60%' //
 	,popupRightArea: '80%' //
     // ,controlUrl: '',

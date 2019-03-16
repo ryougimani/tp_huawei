@@ -44,7 +44,7 @@ class Node extends BasicAdmin {
 				$groups['home'][] = $node;
 			}
 		}
-		$this->success(lang('get_success'), '', ['groups' => $groups, 'lang' => $this->_lang()]);
+		$this->lay_success(lang('get_success'), $groups, $this->_lang());
 	}
 
 	/**
@@ -59,10 +59,10 @@ class Node extends BasicAdmin {
 			if (isset($data['node'])) {
 				$result = DataService::save($this->table, $data, 'node');
 				if ($result !== false) {
-					LogService::write('更新节点成功', $data);
-					$this->success(lang('save_success'), '');
+					LogService::write('更新节点成功', json_encode($data));
+					$this->success(lang('save_success'));
 				}
-				LogService::write('更新节点失败', $data);
+				LogService::write('更新节点失败', json_encode($data));
 			}
 		}
 		$this->error(lang('save_error'));
@@ -77,10 +77,10 @@ class Node extends BasicAdmin {
 	public function clear() {
 		$nodes = array_keys(NodeService::get());
 		if (false !== Db::name($this->table)->whereNotIn('node', $nodes)->delete()) {
-			LogService::write('清理节点成功', '');
+			LogService::write('清理节点成功');
 			$this->success(lang('clear_node_success'), '');
 		}
-		LogService::write('清理节点失败', '');
+		LogService::write('清理节点失败');
 		$this->error(lang('clear_node_error'));
 	}
 }

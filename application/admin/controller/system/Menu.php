@@ -11,7 +11,6 @@ namespace app\admin\controller\system;
 
 use controller\BasicAdmin;
 use think\Db;
-use service\DataService;
 use service\ToolsService;
 
 /**
@@ -24,7 +23,7 @@ class Menu extends BasicAdmin {
 	protected $table = 'SystemMenu';
 
 	/**
-	 * 菜单列表
+	 * 列表
 	 * @access public
 	 * @return array|string
 	 * @throws \think\db\exception\DataNotFoundException
@@ -32,7 +31,7 @@ class Menu extends BasicAdmin {
 	 * @throws \think\exception\DbException
 	 */
 	public function index() {
-		$db = Db::name($this->table)->order(['sort' => 'asc']);
+		$db = Db::name($this->table)->order(['sort' => 'asc', 'id' => 'asc']);
 		return parent::_list($db, false);
 	}
 
@@ -43,9 +42,23 @@ class Menu extends BasicAdmin {
 	 */
 	protected function _data_filter(&$data) {
 		foreach ($data as &$val) {
+			$val['update_time'] = format_time($val['update_time']);
 			$val['ids'] = join(',', ToolsService::getListSubId($data, $val['id']));
 		}
 		$data = ToolsService::listToTable($data);
+	}
+
+	/**
+	 * 其他数据处理
+	 * @access public
+	 * @param array $other_data
+	 * @param array $data
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
+	 */
+	protected function _other_data_filter(&$other_data, $data) {
+		$other_data['menus'] = $this->_form_this_tree_select($data, Db::name($this->table), lang('top_menu'), 'title');
 	}
 
 	/**
@@ -80,9 +93,6 @@ class Menu extends BasicAdmin {
 	 * 表单数据前缀方法
 	 * @access protected
 	 * @param array $data 数据
-	 * @throws \think\db\exception\DataNotFoundException
-	 * @throws \think\db\exception\ModelNotFoundException
-	 * @throws \think\exception\DbException
 	 */
 	protected function _form_filter(&$data) {
 		if ($this->request->isPost()) {
@@ -90,28 +100,10 @@ class Menu extends BasicAdmin {
 			$result = $this->validate($data, "{$this->table}.{$this->request->action()}");
 			(true !== $result) && $this->error($result);
 		} else {
-			$otherData = ['lang' => $this->_lang()];
-			// 上级菜单内容处理
-			$menus = $this->_form_select($this->table, true, lang('top_menu'), 'title');
-			foreach ($menus as $key => &$menu) {
-				// 删除3级以上菜单
-				if (substr_count($menu['path'], '-') > 3) {
-					unset($menus[$key]);
-					continue;
-				}
-				if (isset($data['pid'])) {
-					$current_path = "-{$data['pid']}-{$data['id']}";
-					if ($data['pid'] !== '' && (stripos("{$menu['path']}-", "{$current_path}-") !== false || $menu['path'] === $current_path)) {
-						unset($menus[$key]);
-					}
-				}
-			}
 			// 设置上级菜单
 			if (!isset($data['pid']) && $this->request->get('pid', '0')) {
 				$data['pid'] = $this->request->get('pid', '0');
 			}
-			$otherData['menus'] = $menus;
-			$data['otherData'] = $otherData;
 		}
 	}
 
@@ -126,7 +118,6 @@ class Menu extends BasicAdmin {
 	 * @throws \think\exception\PDOException
 	 */
 	public function move() {
-		$this->title = lang('move_title');
 		return parent::_form_batch($this->table, 'move');
 	}
 
@@ -143,26 +134,6 @@ class Menu extends BasicAdmin {
 			// 规则验证
 			$result = $this->validate($data, "{$this->table}.{$this->request->action()}");
 			(true !== $result) && $this->error($result);
-		} else {
-			// 上级菜单内容处理
-			$menus = $this->_form_select($this->table, true, lang('top_menu'), 'title');
-			foreach ($menus as $key => &$menu) {
-				// 删除3级以上菜单
-				if (substr_count($menu['path'], '-') > 3) {
-					unset($menus[$key]);
-					continue;
-				}
-				if (isset($data['pid']) && is_array($data['pid'])) {
-					foreach ($data['pid'] as $k => $v) {
-						$current_path = "-{$data['pid'][$k]}-{$data['id'][$k]}";
-						if ($data['pid'][$k] !== '' && (stripos("{$menu['path']}-", "{$current_path}-") !== false || $menu['path'] === $current_path)) {
-							unset($menus[$key]);
-						}
-					}
-				}
-			}
-			$this->assign('menus', $menus);
-			$data['id'] = implode(',', $data['id']);
 		}
 	}
 

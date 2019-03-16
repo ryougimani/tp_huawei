@@ -1,5 +1,10 @@
 <?php
 return [
+	//title
+	'add_title' => '添加菜单',
+	'edit_title' => '编辑菜单',
+	'move_title' => '移动菜单',
+	// field
 	'title' => '菜单名称',
 	'title_placeholder' => '请填写菜单名称',
 	'title_description' => '<b>必填</b>，请填写菜单名称（如：用户管理）',
@@ -10,7 +15,7 @@ return [
 	'name_required' => '请输入菜单路由！',
 	'url' => '菜单路径',
 	'url_placeholder' => '请填写菜单路径',
-	'url_description' => '<b>必填</b>，请填写菜单路径（如：/user/index)',
+	'url_description' => '请填写菜单路径（如：/user/index)',
 	'url_required' => '请输入菜单路径！',
 	'node' => '系统节点',
 	'node_placeholder' => '请填写系统节点',
@@ -24,4 +29,5 @@ return [
 	'parent' => '上级菜单',
 	'parent_description' => '<b>必填</b>，请选择上级菜单或顶级菜单（目前最多支持三级菜单）',
 	'top_menu' => '顶级菜单',
+	// list
 ];

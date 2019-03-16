@@ -2,6 +2,7 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 	var $ = layui.$,
 		admin = layui.admin,
 		view = layui.view,
+		laytpl = layui.laytpl,
 		element = layui.element,
 		table = layui.table,
 		tableFilter = layui.tableFilter,
@@ -18,11 +19,21 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 		page: true, // 开启分页
 		limit: 30, // 每页显示的条数
 		limits: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], // 每页条数的选择项
-		text: '对不起，加载出现异常！'
+		text: '对不起，加载出现异常！',
+		done: function (res, curr, count) {
+			// 搜索模板
+			if ($('#search_tpl').length !== 0) {
+				laytpl(search_tpl.innerHTML).render(res, function (html) {
+					$('#search_tpl').remove();
+					$('.layui-card-header').html(html);
+					form.render(null, 'list-search-form');
+				})
+			}
+		}
 	});
 
 	// 监听排序事件
-	table.on('sort(content-list)', function(obj){
+	table.on('sort(content-list)', function (obj) {
 		table.reload('content-list', {
 			initSort: obj,
 			where: {
@@ -33,60 +44,61 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 	});
 
 	// 监听头部工具栏事件
-	table.on('toolbar(content-list)', function(obj){
-		// var checkStatus = table.checkStatus(obj.config.id);
-		switch(obj.event){
-			case 'add': // 添加
-				admin.req({
-					url: layui.setter.controlUrl + '/add.html',
-					done: function (res) {
-						admin.popupRight({
-							id: 'popupRight-add',
-							area: layui.setter.popupRightArea,
-							success: function (layero, index) {
-								view(this.id).render(layui.setter.templateUrl + '/form', res.data).done(function () {
-									form.render(null, 'form');
-									form.on('submit(form-submit)', function (data) {
-										admin.req({
-											url: layui.setter.controlUrl + '/add.html',
-											type: 'post',
-											data: data.field,
-											success: function (res) {
-												layui.table.reload('content-list');
-												layer.close(index);
-											}
-										});
-
+	table.on('toolbar(content-list)', function (obj) {
+		let checkStatus = table.checkStatus(obj.config.id);
+		if (obj.event === 'add') {
+			admin.req({
+				url: layui.setter.controlUrl + '/' + obj.event + '.html',
+				done: function (res) {
+					admin.popupRight({
+						id: 'popupRight-add',
+						area: layui.setter.popupRightArea,
+						success: function (layero, index) {
+							view(this.id).render(layui.setter.templateUrl + '/form', res).done(function () {
+								$('#popupRight-' + obj.event + ' [template]').remove();
+								form.render(null, 'form');
+								form.on('submit(form-submit)', function (data) {
+									admin.req({
+										url: layui.setter.controlUrl + '/' + obj.event + '.html',
+										type: 'post',
+										data: data.field,
+										done: function (res) {
+											layui.table.reload('content-list');
+											layer.close(index);
+										}
 									});
+
 								});
-							}
-						});
-					}
-				});
-				break;
-			case 'del':
-
-				break;
-		}
-	});
-
-	// 监听表格工具条
-	table.on('tool(content-list)', function (obj) {
-		switch (obj.event) {
-			case 'edit': // 编辑
+							});
+						}
+					});
+				}
+			});
+		} else if (obj.event === 'move'
+			|| obj.event === 'audit') {
+			// 移动 || 审核
+			if (checkStatus.data.length > 0) {
+				let id = (function () {
+					let data = [];
+					return layui.each(checkStatus.data, function (index, item) {
+						data.push(item.id);
+					}), data.join(',');
+				}).call(this);
 				admin.req({
-					url: layui.setter.controlUrl + '/edit.html',
-					data: {id: obj.data.id},
+					url: layui.setter.controlUrl + '/' + obj.event + '.html',
+					data: {id: id},
 					done: function (res) {
-						admin.popupRight({
-							id: 'popupRight-edit',
-							area: layui.setter.popupRightArea,
+						admin.popup({
+							title: res.lang[obj.event + '_title'],
+							id: 'popup-' + obj.event,
+							area: layui.setter.popupArea,
 							success: function (layero, index) {
-								view(this.id).render(layui.setter.templateUrl + '/form', res.data).done(function () {
+								view(this.id).render(layui.setter.templateUrl + '/' + obj.event, res).done(function () {
+									$('#popup-' + obj.event + ' [template]').remove();
 									form.render(null, 'form');
 									form.on('submit(form-submit)', function (data) {
 										admin.req({
-											url: layui.setter.controlUrl + '/edit.html',
+											url: layui.setter.controlUrl + '/' + obj.event + '.html',
 											type: 'post',
 											data: data.field,
 											done: function (res) {
@@ -94,62 +106,191 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 												layer.close(index);
 											}
 										});
-
 									});
 								});
 							}
 						});
 					}
 				});
-				break;
-			case 'del': // 删除
-				layer.confirm('确定是否要删除ID为' + obj.data.id + '的数据吗？', function(index){
+			}
+		} else if (obj.event === 'del'
+			|| obj.event === 'restore'
+			|| obj.event === 'thorough_del') {
+			// 删除 || 还原 || 彻底删除
+			if (checkStatus.data.length > 0) {
+				let msg = '';
+				switch (obj.event) {
+					case 'del': // 删除
+						msg = '删除';
+						break;
+					case 'restore': // 还原
+						msg = '还原';
+						break;
+					case 'thorough_del': // 删除
+						msg = '彻底删除';
+						break;
+				}
+				let id = (function () {
+					let data = [];
+					return layui.each(checkStatus.data, function (index, item) {
+						data.push(item.id);
+					}), data.join(',');
+				}).call(this);
+				layer.confirm('确定是否要' + msg + 'ID为（' + id + '）的数据吗？', function (index) {
 					admin.req({
-						url: layui.setter.controlUrl + '/del.html',
+						url: layui.setter.controlUrl + '/' + obj.event + '.html',
 						type: 'post',
-						data: {id : obj.data.id, field: 'delete'},
+						data: {id: id, field: obj.event},
 						done: function (res) {
 							layui.table.reload('content-list');
 						}
 					});
 					layer.close(index);
 				});
-				break;
-			case 'restore': // 还原
-				layer.confirm('确定是否要还原ID为' + obj.data.id + '的数据吗？', function(index){
-					admin.req({
-						url: layui.setter.controlUrl + '/restore.html',
-						type: 'post',
-						data: {id : obj.data.id, field: 'restore'},
-						done: function (res) {
-							layui.table.reload('content-list');
+			}
+		} else if (obj.event === 'empty_trash') {
+			layer.confirm('确定是否要清空回收站的数据吗？', function (index) {
+				admin.req({
+					url: layui.setter.controlUrl + '/' + obj.event + '.html',
+					type: 'post',
+					done: function (res) {
+						layui.table.reload('content-list');
+					}
+				});
+				layer.close(index);
+			});
+		}
+	});
+
+	// 监听表格工具条
+	table.on('tool(content-list)', function (obj) {
+		if (obj.event === 'edit') {
+			// 编辑
+			admin.req({
+				url: layui.setter.controlUrl + '/' + obj.event + '.html',
+				data: {id: obj.data.id},
+				done: function (res) {
+					admin.popupRight({
+						id: 'popupRight-' + obj.event,
+						area: layui.setter.popupRightArea,
+						success: function (layero, index) {
+							view(this.id).render(layui.setter.templateUrl + '/form', res).done(function () {
+								$('#popupRight-' + obj.event + ' [template]').remove();
+								form.render(null, 'form');
+								form.on('submit(form-submit)', function (data) {
+									admin.req({
+										url: layui.setter.controlUrl + '/' + obj.event + '.html',
+										type: 'post',
+										data: data.field,
+										done: function (res) {
+											layui.table.reload('content-list');
+											layer.close(index);
+										}
+									});
+
+								});
+							});
 						}
 					});
-					layer.close(index);
-				});
-				break;
-			case 'thorough-del': // 删除
-				layer.confirm('确定是否要彻底删除ID为' + obj.data.id + '的数据吗？', function(index){
-					admin.req({
-						url: layui.setter.controlUrl + '/thorough_del.html',
-						type: 'post',
-						data: {id : obj.data.id, field: 'restore'},
-						done: function (res) {
-							layui.table.reload('content-list');
+				}
+			});
+		} else if (obj.event === 'move'
+			|| obj.event === 'audit') {
+			// 移动 || 审核
+			admin.req({
+				url: layui.setter.controlUrl + '/' + obj.event + '.html',
+				data: {id: obj.data.id},
+				done: function (res) {
+					admin.popup({
+						title: res.lang[obj.event + '_title'],
+						id: 'popup-' + obj.event,
+						area: layui.setter.popupArea,
+						success: function (layero, index) {
+							view(this.id).render(layui.setter.templateUrl + '/' + obj.event, res).done(function () {
+								$('#popup-' + obj.event + ' [template]').remove();
+								form.render(null, 'form');
+								form.on('submit(form-submit)', function (data) {
+									admin.req({
+										url: layui.setter.controlUrl + '/' + obj.event + '.html',
+										type: 'post',
+										data: data.field,
+										done: function (res) {
+											layui.table.reload('content-list');
+											layer.close(index);
+										}
+									});
+								});
+							});
 						}
 					});
-					layer.close(index);
+				}
+			});
+		} else if (obj.event === 'del'
+			|| obj.event === 'restore'
+			|| obj.event === 'thorough_del') {
+			// 删除 || 还原 || 彻底删除
+			let msg = '';
+			switch (obj.event) {
+				case 'del': // 删除
+					msg = '删除';
+					break;
+				case 'restore': // 还原
+					msg = '还原';
+					break;
+				case 'thorough_del': // 删除
+					msg = '彻底删除';
+					break;
+			}
+			layer.confirm('确定是否要' + msg + 'ID为（' + obj.data.id + '）的数据吗？', function (index) {
+				admin.req({
+					url: layui.setter.controlUrl + '/' + obj.event + '.html',
+					type: 'post',
+					data: {id: obj.data.id, field: obj.event},
+					done: function (res) {
+						layui.table.reload('content-list');
+					}
 				});
-				break;
+				layer.close(index);
+			});
+		} else if (obj.event === 'password'
+			|| obj.event === 'auth') {
+			admin.req({
+				url: layui.setter.controlUrl + '/' + obj.event + '.html',
+				data: {id: obj.data.id},
+				done: function (res) {
+					admin.popup({
+						title: res.lang[obj.event + '_title'],
+						id: 'popup-' + obj.event,
+						area: layui.setter.popupArea,
+						success: function (layero, index) {
+							view(this.id).render(layui.setter.templateUrl + '/' + obj.event, res).done(function () {
+								$('#popup-' + obj.event + ' [template]').remove();
+								form.render(null, 'form');
+								form.on('submit(form-submit)', function (data) {
+									admin.req({
+										url: layui.setter.controlUrl + '/' + obj.event + '.html',
+										type: 'post',
+										data: data.field,
+										done: function (res) {
+											layui.table.reload('content-list');
+											layer.close(index);
+										}
+									});
+								});
+							});
+						}
+					});
+				}
+			});
 		}
 	});
 
 	// 监听单元格编辑
-	table.on('edit(content-list)', function(obj){
+	table.on('edit(content-list)', function (obj) {
 		admin.req({
 			url: layui.setter.controlUrl + '/' + obj.field + '.html',
 			type: 'post',
-			data: {id : obj.data.id, field: obj.field, value: obj.value},
+			data: {id: obj.data.id, field: obj.field, value: obj.value},
 			done: function (res) {
 				layui.table.reload('content-list');
 			}
@@ -158,7 +299,6 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 
 	// 监听状态操作
 	form.on('switch(status)', function(obj){
-		// layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
 		if (obj.elem.checked) { // 启用
 			admin.req({
 				url: layui.setter.controlUrl + '/enables.html',
@@ -175,9 +315,13 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 	});
 
 	// 标签切换
-	element.on('tab(content-header-tab)', function(elem){
+	element.on('tab(content-header-tab)', function (elem) {
+		let toolbar = '#table-header-operation';
+		if ($(this).attr('lay-url') === '/recycle.html')
+			toolbar = '#table-header-operation-recycle';
 		table.reload('content-list', {
 			url: layui.setter.controlUrl + $(this).attr('lay-url'),
+			toolbar: toolbar
 		});
 	});
 
@@ -188,7 +332,7 @@ layui.define(['table', 'element', 'form', 'tableFilter'], function (exports) {
 
 	// 监听搜索
 	form.on('submit(list-search)', function (data) {
-		var field = data.field;
+		let field = data.field;
 		// 执行重载
 		table.reload('content-list', {
 			where: field

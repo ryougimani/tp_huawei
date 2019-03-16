@@ -10,6 +10,7 @@
 use think\Db;
 use service\DataService;
 use service\NodeService;
+use Overtrue\Pinyin\Pinyin;
 
 /**
  * RBAC节点权限验证

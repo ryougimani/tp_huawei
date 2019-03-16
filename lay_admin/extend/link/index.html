@@ -1,0 +1,126 @@
+<title>链接管理</title>
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a><cite>主页</cite></a>
+		<a><cite>扩展</cite></a>
+		<a><cite>链接管理</cite></a>
+	</div>
+</div>
+<div class="layui-fluid">
+	<div class="layui-card">
+		<div class="layui-tab layui-tab-brief" id="content-header-tab" lay-filter="content-header-tab">
+			<ul class="layui-tab-title">
+				<li lay-url="/index.html" class="layui-this">全部</li>
+				<li lay-url="/wait_audit.html">待审核</li>
+				<li lay-url="/index.html?audit=1">已通过</li>
+				<li lay-url="/index.html?audit=-1">为通过</li>
+				<li lay-url="/recycle.html">回收站</li>
+			</ul>
+		</div>
+		<div class="layui-form layui-form-pane layui-card-header layuiadmin-card-header-auto" lay-filter="list-search-form"></div>
+		<div class="layui-card-body">
+			<table id="content-list" lay-filter="content-list"></table>
+		</div>
+	</div>
+</div>
+<!--搜索 start-->
+<script type="text/html" id="search_tpl">
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">{{d.lang.query_key}}</label>
+			<div class="layui-input-block">
+				<input type="text" name="query_key" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">{{d.lang.class}}</label>
+			<div class="layui-input-block">
+				<select name="class_id" autocomplete="off">
+					{{#layui.each(d.other_data.classes,function(index,item){}}
+					<option value="{{item.ids}}">{{item.name}}</option>
+					{{#});}}
+				</select>
+			</div>
+		</div>
+		<div class="layui-inline">
+			<button class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" lay-submit lay-filter="list-search">
+				<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i> {{d.lang.search}}
+			</button>
+		</div>
+	</div>
+</script>
+<!--搜索 end-->
+<!--表头工具栏 start-->
+<script type="text/html" id="table-header-operation">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+		<button class="layui-btn layui-btn-sm" lay-event="move">移动</button>
+		<button class="layui-btn layui-btn-sm" lay-event="audit">审核</button>
+		<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</button>
+	</div>
+</script>
+<script type="text/html" id="table-header-operation-recycle">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="restore">还原</button>
+		<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="thorough_del">彻底删除</button>
+		<button class="layui-btn layui-btn-sm layui-btn-warm" lay-event="empty_trash">清空回收站</button>
+	</div>
+</script>
+<!--表头工具栏 end-->
+<!--状态 start-->
+<script type="text/html" id="table-content-status">
+	<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{#if(d.status==1){}}checked{{#}}} {{#if(d.is_deleted==1){}}disabled{{#}}} />
+</script>
+<!--状态 end-->
+<!--操作 start-->
+<script type="text/html" id="table-content-operation">
+	{{#if(d.is_deleted==0){}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="move">移动</button>
+		{{#if(d.audit==0){}}
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="audit">审核</button>
+		{{#}else{}}
+		<button class="layui-btn layui-btn-xs layui-btn-disabled">审核</button>
+		{{#}}}
+		<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+	</div>
+	{{#}else if(d.is_deleted==1){}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="restore">还原</button>
+		<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="thorough_del">彻底删除</button>
+	</div>
+	{{#}}}
+</script>
+<!--操作 end-->
+<script>
+	layui.use('list', layui.factory('list')).use(['admin', 'list'], function(){
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			laytpl = layui.laytpl,
+			element = layui.element,
+			table = layui.table,
+			form = layui.form;
+
+		layui.setter['controlUrl'] = '/admin/extend.link';
+		layui.setter['templateUrl'] = 'extend/link';
+
+		// 表格
+		table.render({
+			url: layui.setter.controlUrl + '/index.html',
+			cols: [[
+				{type: 'checkbox', fixed: 'left'},
+				{field: 'id', title: 'id', align: 'center', width: 70},
+				{field: 'name', title: '链接名称', minWidth: 200, align: 'center'},
+				{field: 'class', title: '链接分类', minWidth: 150, align: 'center'},
+				{field: 'link', title: '链接地址', minWidth: 150, align: 'center'},
+				{field: 'sort', title: '排序', width: 80, align: 'center', unresize: true, edit: true},
+				{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
+				{field: 'update_time', title: '更新时间', width: 160, align: 'center', unresize: true},
+				{title: '操作', fixed: 'right', width: 180, align:'center', unresize: true, toolbar: '#table-content-operation'}
+			]],
+			height: 'full-270', // 最大高度
+		});
+	});
+</script>

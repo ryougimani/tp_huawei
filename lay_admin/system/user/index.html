@@ -1,17 +1,11 @@
-<script type="text/html" template>
-	<link rel="stylesheet" href="{{layui.setter.base}}style/tableFilter.css?v={{layui.admin.v}}-1" media="all">
-</script>
-
 <title>用户列表</title>
-
 <div class="layui-card layadmin-header">
 	<div class="layui-breadcrumb" lay-filter="breadcrumb">
-		<a lay-href="">主页</a>
+		<a><cite>主页</cite></a>
 		<a><cite>系统</cite></a>
-		<a><cite>用户列表</cite></a>
+		<a><cite>系统用户</cite></a>
 	</div>
 </div>
-
 <div class="layui-fluid">
 	<div class="layui-card">
 		<div class="layui-tab layui-tab-brief" id="content-header-tab" lay-filter="content-header-tab">
@@ -20,68 +14,80 @@
 				<li lay-url="/recycle.html">回收站</li>
 			</ul>
 		</div>
-		<div class="layui-form layui-form-pane layui-card-header layuiadmin-card-header-auto" lay-filter="list-search-form">
-			<div class="layui-form-item">
-				<script type="text/html" template lay-url="/admin/system.user/search_from.html" lay-done="layui.data.search_form(d);">
-					<div class="layui-inline">
-						<label class="layui-form-label">{{d.data.lang.id}}</label>
-						<div class="layui-input-inline">
-							<input type="text" name="id" class="layui-input" autocomplete="off" />
-						</div>
-					</div>
-					<div class="layui-inline">
-						<label class="layui-form-label">{{d.data.lang.username}}</label>
-						<div class="layui-input-inline">
-							<input type="text" name="username" class="layui-input" autocomplete="off" />
-						</div>
-					</div>
-					<div class="layui-inline">
-						<button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="list-search">
-							<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>{{d.data.lang.search}}
-						</button>
-					</div>
-				</script>
-			</div>
-		</div>
+		<div class="layui-form layui-form-pane layui-card-header layuiadmin-card-header-auto" lay-filter="list-search-form"></div>
 		<div class="layui-card-body">
-			<script type="text/html" id="table-header-operation">
-				<div class="layui-btn-container">
-					<button class="layui-btn layui-btn-sm" lay-event="add" data-url="/admin/system.user/add.html">添加用户</button>
-				</div>
-			</script>
 			<table id="content-list" lay-filter="content-list"></table>
-			<script type="text/html" id="table-content-status">
-				<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{d.status == 1 ? 'checked' : ''}}>
-			</script>
-			<script type="text/html" id="table-content-operation">
-				{{#if(d.is_deleted == 0) {}}
-				{{#if(d.id != 10000) {}}
-				<div class="layui-btn-group">
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="pwd">密码</button>
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
-					<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
-				</div>
-				{{#} else {}}
-				<div class="layui-btn-group">
-					<button class="layui-btn layui-btn-xs layui-btn-disabled">编辑</button>
-					<button class="layui-btn layui-btn-xs layui-btn-disabled">密码</button>
-					<button class="layui-btn layui-btn-xs layui-btn-disabled">授权</button>
-					<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
-				</div>
-				{{#}}}
-				{{#} else if(d.is_deleted == 1) {}}
-				<div class="layui-btn-group">
-					<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="restore">还原</button>
-				</div>
-				{{#}}}
-			</script>
 		</div>
 	</div>
 </div>
-
+<!--搜索 start-->
+<script type="text/html" id="search_tpl">
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">{{d.lang.id}}</label>
+			<div class="layui-input-block">
+				<input type="text" name="id" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">{{d.lang.username}}</label>
+			<div class="layui-input-block">
+				<input type="text" name="username" autocomplete="off" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-inline">
+			<button class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" lay-submit lay-filter="list-search">
+				<i class="layui-icon layui-icon-search layuiadmin-button-btn"></i> {{d.lang.search}}
+			</button>
+		</div>
+	</div>
+</script>
+<!--搜索 end-->
+<!--表头工具栏 start-->
+<script type="text/html" id="table-header-operation">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+		<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</button>
+	</div>
+</script>
+<script type="text/html" id="table-header-operation-recycle">
+	<div class="layui-btn-container">
+		<button class="layui-btn layui-btn-sm" lay-event="restore">还原</button>
+	</div>
+</script>
+<!--表头工具栏 end-->
+<!--状态 start-->
+<script type="text/html" id="table-content-status">
+	<input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="status" {{#if(d.status==1){}}checked{{#}}} {{#if(d.is_deleted==1){}}disabled{{#}}} />
+</script>
+<!--状态 end-->
+<!--操作 start-->
+<script type="text/html" id="table-content-operation">
+	{{#if(d.is_deleted == 0) {}}
+	{{#if(d.id != 10000) {}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="edit">编辑</button>
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="password">密码</button>
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="auth">授权</button>
+		<button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</button>
+	</div>
+	{{#} else {}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-disabled">编辑</button>
+		<button class="layui-btn layui-btn-xs layui-btn-disabled">密码</button>
+		<button class="layui-btn layui-btn-xs layui-btn-disabled">授权</button>
+		<button class="layui-btn layui-btn-xs layui-btn-disabled">删除</button>
+	</div>
+	{{#}}}
+	{{#} else if(d.is_deleted == 1) {}}
+	<div class="layui-btn-group">
+		<button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="restore">还原</button>
+	</div>
+	{{#}}}
+</script>
+<!--操作 end-->
 <script>
-	layui.use('list', layui.factory('list')).use(['admin', 'list', 'table'], function(){
+	layui.use('list', layui.factory('list')).use(['admin', 'list'], function(){
 		var $ = layui.$,
 			admin = layui.admin,
 			view = layui.view,
@@ -97,137 +103,17 @@
 			url: layui.setter.controlUrl + '/index.html',
 			cols: [[
 				{type: 'checkbox', fixed: 'left'},
-				{field: 'id', title: 'id', align: 'center', width: 70, sort: true},
+				{field: 'id', title: 'ID', align: 'center', width: 70},
 				{field: 'username', title: '用户账号', minWidth: 200, align: 'center'},
 				{field: 'phone', title: '用户手机', minWidth: 150, align: 'center'},
 				{field: 'email', title: '电子邮箱', minWidth: 150, align: 'center'},
 				{field: 'authorize', title: '用户角色', minWidth: 150, align: 'center'},
 				{field: 'login_num', title: '登录次数', minWidth: 90, align: 'center'},
-				{field: 'login_time', title: '最后登录时间', width: 160, align: 'center'},
+				{field: 'login_time', title: '最后登录时间', width: 160, align: 'center', unresize: true},
 				{field: 'status', title: '状态', width: 100, align: 'center', unresize: true, toolbar: '#table-content-status'},
 				{title: '操作', fixed: 'right', width: 180, align:'center', unresize: true, toolbar: '#table-content-operation'}
 			]],
 			height: 'full-270', // 最大高度
-			// initSort: {field: 'id', type: 'desc'}, // 默认排序
-		});
-
-		// 监听表格工具条
-		table.on('tool(content-list)', function (obj) {
-			switch (obj.event) {
-				case 'edit': // 编辑
-					admin.req({
-						url: layui.setter.controlUrl + '/edit.html',
-						data: {id: obj.data.id},
-						done: function (res) {
-							admin.popupRight({
-								id: 'popupRight-edit',
-								area: layui.setter.popupRightArea,
-								success: function (layero, index) {
-									view(this.id).render(layui.setter.templateUrl + '/form', res.data).done(function () {
-										form.render(null, 'form');
-										form.on('submit(form-submit)', function (data) {
-											admin.req({
-												url: layui.setter.controlUrl + '/edit.html',
-												type: 'post',
-												data: data.field,
-												done: function (res) {
-													layui.table.reload('content-list');
-													layer.close(index);
-												}
-											});
-
-										});
-									});
-								}
-							});
-						}
-					});
-					break;
-				case 'del': // 删除
-					layer.confirm('确定是否要删除ID为' + obj.data.id + '的数据吗？', function(index){
-						admin.req({
-							url: layui.setter.controlUrl + '/del.html',
-							type: 'post',
-							data: {id : obj.data.id, field: 'delete'},
-							done: function (res) {
-								layui.table.reload('content-list');
-							}
-						});
-						layer.close(index);
-					});
-					break;
-				case 'restore': // 还原
-					layer.confirm('确定是否要还原ID为' + obj.data.id + '的数据吗？', function(index){
-						admin.req({
-							url: layui.setter.controlUrl + '/restore.html',
-							type: 'post',
-							data: {id : obj.data.id, field: 'restore'},
-							done: function (res) {
-								layui.table.reload('content-list');
-							}
-						});
-						layer.close(index);
-					});
-					break;
-				case 'pwd': // 密码
-					admin.req({
-						url: layui.setter.controlUrl + '/password.html',
-						data: {id: obj.data.id},
-						done: function (res) {
-							admin.popup({
-								id: 'popupRight-password',
-								area: layui.setter.popupArea,
-								success: function (layero, index) {
-									view(this.id).render(layui.setter.templateUrl + '/password', res.data).done(function () {
-										form.render(null, 'form');
-										form.on('submit(form-submit)', function (data) {
-											admin.req({
-												url: layui.setter.controlUrl + '/password.html',
-												type: 'post',
-												data: data.field,
-												done: function (res) {
-													layui.table.reload('content-list');
-													layer.close(index);
-												}
-											});
-
-										});
-									});
-								}
-							});
-						}
-					});
-					break;
-				case 'auth': // 权限
-					admin.req({
-						url: layui.setter.controlUrl + '/auth.html',
-						data: {id: obj.data.id},
-						done: function (res) {
-							admin.popup({
-								id: 'popupRight-auth',
-								area: layui.setter.popupArea,
-								success: function (layero, index) {
-									view(this.id).render(layui.setter.templateUrl + '/auth', res.data).done(function () {
-										form.render(null, 'form');
-										form.on('submit(form-submit)', function (data) {
-											admin.req({
-												url: layui.setter.controlUrl + '/auth.html',
-												type: 'post',
-												data: data.field,
-												done: function (res) {
-													layui.table.reload('content-list');
-													layer.close(index);
-												}
-											});
-
-										});
-									});
-								}
-							});
-						}
-					});
-					break;
-			}
 		});
 	});
 </script>

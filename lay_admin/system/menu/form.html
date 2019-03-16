@@ -1,14 +1,14 @@
-<div class="layui-card-header">系统菜单</div>
-<div class="layui-card-body">
-	<div class="layui-form layui-col-md11" lay-filter="form">
-		<script type="text/html" template>
-			{{#var data=d.params,lang=data.otherData.lang;}}
-			{{#var menus=data.otherData.menus;}}
+<script type="text/html" template lay-done="layui.data.data_form(d);">
+	{{#var data=d.params.data,lang=d.params.lang;}}
+	<div class="layui-card-header">{{#if(!data.id){}}{{lang.add_title}}{{#}else{}}{{lang.edit_title}}{{#}}}</div>
+	<div class="layui-card-body">
+		<div class="layui-form layui-col-md11" lay-filter="form">
+
 			<div class="layui-form-item">
 				<label class="layui-form-label">{{lang.parent||''}}</label>
 				<div class="layui-input-block">
 					<select name="pid">
-						{{#layui.each(menus, function(index, item){}}
+						{{#layui.each(d.params.other_data.menus, function(index, item){}}
 						{{#if(item.id==(data.pid||0)){}}
 						<option value="{{item.id}}" selected>{{item.spl}}{{item.title}}</option>
 						{{#}else{}}
@@ -43,7 +43,7 @@
 			<div class="layui-form-item">
 				<label class="layui-form-label">{{lang.node||''}}</label>
 				<div class="layui-input-block">
-					<input type="text" name="node" class="layui-input" lay-verify="" value="{{data.node||''}}" placeholder="{{lang.node_placeholder||''}}" onblur="(this.value === '') && (this.value = '#')" />
+					<input type="text" name="node" class="layui-input" lay-verify="" value="{{#if(data.link){}}{{data.link}}{{#}else{}}#{{#}}}" placeholder="{{lang.node_placeholder||''}}" onblur="(this.value === '') && (this.value = '#')" />
 					<div class="layui-form-mid layui-word-aux">{{lang.node_description||''}}</div>
 				</div>
 			</div>
@@ -56,9 +56,11 @@
 					</div>
 				</div>
 			</div>
-		</script>
+		</div>
 	</div>
-</div>
-
+</script>
 <script>
+	layui.data.data_form = function(d) {
+
+	};
 </script>

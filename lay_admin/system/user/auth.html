@@ -1,51 +1,41 @@
-
-<script type="text/html" template lay-done="layui.data.form(d);">
-	<div class="layui-form layui-col-md11" lay-filter="form">
-		{{#var data=d.params,lang=data.otherData.lang;}}
-		<div class="layui-form-item">
-			<label class="layui-form-label">{{lang.username||''}}</label>
-			<div class="layui-input-block">
-				<input type="text" class="layui-input" value="{{data.username||''}}" disabled />
+<script type="text/html" template lay-done="layui.data.data_form(d);">
+	{{#var data=d.params.data,lang=d.params.lang;}}
+	<div class="layui-card-body layui-row">
+		<div class="layui-form layui-col-md11" lay-filter="form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.username||''}}</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{{data.username||''}}" disabled />
+				</div>
 			</div>
-		</div>
-		{{#var authorizes=data.otherData.authorizes;}}
-		{{#if(authorizes.length > 0){}}
-		<div class="layui-form-item">
-			<label class="layui-form-label">{{lang.authorize||''}}</label>
-			<div class="layui-input-block">
-				{{#layui.each(authorizes,function(index,item){ var checked=true; layui.each(data.authorize,function(index1,item1){ if(item.id==item1){}}
-				<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}" checked />
-				{{#checked=false;return; } }); if(checked){}}
-				<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}" />
-				{{#} });}}
-				<p class="help-block color-desc">{{lang.authorize_description||''}}</p>
+			{{#var authorizes=d.params.other_data.authorizes;}}
+			{{#if(authorizes.length > 0){}}
+			<div class="layui-form-item">
+				<label class="layui-form-label">{{lang.authorize||''}}</label>
+				<div class="layui-input-block">
+					{{#layui.each(authorizes,function(index,item){ var checked=true; layui.each(data.authorize,function(index1,item1){ if(item.id==item1){}}
+					<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}" checked />
+					{{#checked=false;return; } }); if(checked){}}
+					<input type="checkbox" name="authorize[]" lay-skin="primary" value="{{item.id}}" title="{{item.name}}" />
+					{{#} });}}
+					<p class="help-block color-desc">{{lang.authorize_description||''}}</p>
+				</div>
 			</div>
-		</div>
-		{{#}}}
-		<div class="layui-form-item">
-			<div class="layui-input-block">
-				<div class="layui-footer">
-					{{#if(data.id){}}<input type="hidden" name="id" lay-verify="required" value="{{data.id||''}}"/>{{#}}}
-					{{data.__token__||''}}
-					<button class="layui-btn" lay-submit lay-filter="form-submit">{{lang.save||''}}</button>
+			{{#}}}
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<div class="layui-footer">
+						{{#if(data.id){}}<input type="hidden" name="id" lay-verify="required" value="{{data.id||''}}"/>{{#}}}
+						{{data.__token__||''}}
+						<button class="layui-btn" lay-submit lay-filter="form-submit">{{lang.save||''}}</button>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </script>
-
 <script>
-	layui.use(['admin', 'form'], function () {
-		var $ = layui.$,
-			admin = layui.admin,
-			element = layui.element,
-			layer = layui.layer,
-			form = layui.form;
+	layui.data.data_form = function(d) {
 
-
-		layui.data.form = function (d) {
-			form.render(null, 'form');
-
-		};
-	});
+	};
 </script>

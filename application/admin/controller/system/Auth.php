@@ -38,6 +38,17 @@ class Auth extends BasicAdmin {
 	}
 
 	/**
+	 * 列表数据处理
+	 * @access protected
+	 * @param array $data
+	 */
+	protected function _data_filter(&$data) {
+		foreach ($data as &$val) {
+			$val['update_time'] = format_time($val['update_time']);
+		}
+	}
+
+	/**
 	 * 添加
 	 * @access public
 	 * @return \think\response\View
@@ -75,9 +86,6 @@ class Auth extends BasicAdmin {
 			// 规则验证
 			$result = $this->validate($data, "{$this->table}.{$this->request->action()}");
 			(true !== $result) && $this->error($result);
-		} else {
-			$otherData = ['lang' => $this->_lang()];
-			$data['otherData'] = $otherData;
 		}
 	}
 
@@ -88,7 +96,7 @@ class Auth extends BasicAdmin {
 	 * @throws \think\exception\PDOException
 	 */
 	public function enables() {
-		if (DataService::update($this->table)) {
+		if ($this->_update($this->table)) {
 			$this->success(lang('enables_success'), '');
 		}
 		$this->error(lang('enables_error'));
@@ -101,7 +109,7 @@ class Auth extends BasicAdmin {
 	 * @throws \think\exception\PDOException
 	 */
 	public function disables() {
-		if (DataService::update($this->table)) {
+		if ($this->_update($this->table)) {
 			$this->success(lang('disables_success'), '');
 		}
 		$this->error(lang('disables_error'));

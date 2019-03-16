@@ -33,7 +33,7 @@ class User extends BasicAdmin {
 	 * @throws \think\exception\DbException
 	 */
 	public function index() {
-		$db = Db::name($this->table)->field($this->field);
+		$db = Db::name($this->table)->field($this->field)->order(['id' => 'desc']);
 		$this->_list_where($db);
 		return parent::_list($db,true, 'index');
 	}
@@ -47,7 +47,7 @@ class User extends BasicAdmin {
 	 * @throws \think\exception\DbException
 	 */
 	public function recycle() {
-		$db = Db::name($this->table)->field($this->field);
+		$db = Db::name($this->table)->field($this->field)->order(['id' => 'desc']);
 		$this->_list_where($db);
 		return parent::_list($db, true, 'index');
 	}
@@ -114,12 +114,15 @@ class User extends BasicAdmin {
 	}
 
 	/**
-	 * 搜索表单
+	 * 其他数据处理
 	 * @access public
+	 * @param array $other_data
+	 * @throws \think\db\exception\DataNotFoundException
+	 * @throws \think\db\exception\ModelNotFoundException
+	 * @throws \think\exception\DbException
 	 */
-	public function search_from() {
-
-		$this->success(lang('get_success'), '', ['lang' => $this->_lang()]);
+	protected function _other_data_filter(&$other_data) {
+		$other_data['authorizes'] = Db::name('SystemAuth')->where('status', 1)->select();
 	}
 
 	/**
@@ -185,9 +188,6 @@ class User extends BasicAdmin {
 	 * 表单数据默认处理
 	 * @access public
 	 * @param array $data
-	 * @throws \think\db\exception\DataNotFoundException
-	 * @throws \think\db\exception\ModelNotFoundException
-	 * @throws \think\exception\DbException
 	 */
 	public function _form_filter(&$data) {
 		if ($this->request->isPost()) {
@@ -199,18 +199,12 @@ class User extends BasicAdmin {
 			// 密码加密
 			in_array($this->request->action(), ['add', 'password']) && $data['password'] = password_encode($data['password'], isset($data['random_code']) ? $data['random_code'] : Db::name($this->table)->where('id', $data['id'])->value('random_code'));
 			// 权限处理
-			isset($data['authorize']) && is_array($data['authorize']) && $data['authorize'] = join(',', $data['authorize']);
+			in_array($this->request->action(), ['add', 'auth']) && $data['authorize'] = (isset($data['authorize']) && is_array($data['authorize'])) ? join(',', $data['authorize']) : null;
 		} else {
-			$otherData = ['lang' => $this->_lang()];
 			if (in_array($this->request->action(), ['add', 'auth'])) {
 				// 角色
 				isset($data['authorize']) && $data['authorize'] = array_filter(explode(',', $data['authorize']));
-				$otherData['authorizes'] = Db::name('SystemAuth')->where('status', 1)->select();
 			}
-			if (in_array($this->request->action(), ['password'])) {
-				$otherData['not_auth'] = false;
-			}
-			$data['otherData'] = $otherData;
 		}
 	}
 
